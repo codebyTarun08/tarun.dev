@@ -126,7 +126,7 @@ export function Hero() {
             {mounted && (
               <Spline 
                 key="spline-hero"
-                scene="https://prod.spline.design/6Wq1Q7YGyWf8Z9lz/scene.splinecode" 
+                scene="https://my.spline.design/cubic-icmpLltp4n8I05vuYSSSVbDF/" 
                 className="w-full h-full pointer-events-auto lg:pointer-events-none xl:pointer-events-auto"
               />
             )}
