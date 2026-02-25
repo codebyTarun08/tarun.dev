@@ -18,7 +18,14 @@ export function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
   const [zoom, setZoom] = React.useState(100)
   const [showQR, setShowQR] = React.useState(false)
   const [resumeUrl, setResumeUrl] = React.useState("/resume.pdf") // Fallback
+  const [origin, setOrigin] = React.useState('https://tarun.dev')
   const qrRef = React.useRef<HTMLDivElement>(null)
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setOrigin(window.location.origin)
+    }
+  }, [])
 
   React.useEffect(() => {
     async function fetchResumeUrl() {
@@ -132,13 +139,13 @@ export function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
               <div className="hidden">
                 <QRCodeCanvas 
                   id="resume-qr-canvas"
-                  value={typeof window !== 'undefined' ? window.location.origin : 'https://tarun.dev'}
+                  value={origin}
                   size={200}
                   level="H"
                 />
               </div>
               <QRCodeSVG 
-                value={typeof window !== 'undefined' ? window.location.origin : 'https://tarun.dev'}
+                value={origin}
                 size={160}
                 level="H"
                 includeMargin={false}
