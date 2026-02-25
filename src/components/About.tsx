@@ -1,16 +1,9 @@
-
 "use client"
 
 import * as React from "react"
 import Image from "next/image"
-import { Badge } from "@/components/ui/badge"
 import { GitHubStats } from "./GitHubStats"
 import { PlaceHolderImages } from "@/lib/placeholder-images"
-
-const skills = [
-  "React", "Next.js", "TypeScript", "Node.js", "Tailwind CSS", 
-  "Firebase", "PostgreSQL", "Docker", "UI/UX Design", "GraphQL"
-]
 
 export function About() {
   const profileImg = PlaceHolderImages.find(img => img.id === "about-profile")
@@ -38,20 +31,9 @@ export function About() {
             <div>
               <h2 className="text-sm font-bold text-primary uppercase tracking-[0.3em] mb-4">About Me</h2>
               <h3 className="text-4xl font-bold mb-6">Crafting Digital Excellence Through Clean Code.</h3>
-              <p className="text-lg text-muted-foreground leading-relaxed mb-6">
+              <p className="text-lg text-muted-foreground leading-relaxed">
                 I am a full-stack developer based in India, passionate about building high-performance web applications that provide exceptional user experiences. With expertise in the modern web ecosystem, I bridge the gap between complex engineering and elegant design.
               </p>
-            </div>
-
-            <div className="space-y-4">
-              <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider">My Stack</h4>
-              <div className="flex flex-wrap gap-2">
-                {skills.map((skill) => (
-                  <Badge key={skill} variant="outline" className="px-4 py-1.5 rounded-full border-primary/20 bg-background hover:bg-primary hover:text-white transition-colors cursor-default">
-                    {skill}
-                  </Badge>
-                ))}
-              </div>
             </div>
 
             <div className="pt-4">
