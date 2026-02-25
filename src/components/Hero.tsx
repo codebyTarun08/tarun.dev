@@ -32,7 +32,7 @@ export function Hero() {
 
   React.useEffect(() => {
     // A slight delay ensures the layout has settled before Spline attempts to initialize its buffer
-    const timer = setTimeout(() => setMounted(true), 200);
+    const timer = setTimeout(() => setMounted(true), 500);
     return () => clearTimeout(timer);
   }, []);
 
@@ -126,7 +126,7 @@ export function Hero() {
             {mounted && (
               <Spline 
                 key="spline-hero"
-                scene="https://my.spline.design/cubic-icmpLltp4n8I05vuYSSSVbDF/" 
+                scene="https://prod.spline.design/6Wq1Q7YGyWf8Z9lz/scene.splinecode" 
                 className="w-full h-full pointer-events-auto lg:pointer-events-none xl:pointer-events-auto"
               />
             )}
