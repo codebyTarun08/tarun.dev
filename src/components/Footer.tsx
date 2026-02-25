@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -6,7 +5,11 @@ import Link from "next/link"
 import { Github, Twitter, Linkedin, Instagram } from "lucide-react"
 
 export function Footer() {
-  const currentYear = new Date().getFullYear()
+  const [year, setYear] = React.useState<number | null>(null)
+
+  React.useEffect(() => {
+    setYear(new Date().getFullYear())
+  }, [])
 
   return (
     <footer className="py-12 border-t border-border/40">
@@ -16,7 +19,7 @@ export function Footer() {
             <Link href="/" className="text-xl font-bold tracking-tighter text-primary mb-2">
               DevSphere<span className="text-accent">.</span>
             </Link>
-            <p className="text-sm text-muted-foreground">© {currentYear} Tarun. All rights reserved.</p>
+            <p className="text-sm text-muted-foreground">© {year || "..."} Tarun. All rights reserved.</p>
           </div>
 
           <div className="flex gap-4">
