@@ -3,24 +3,10 @@
 import * as React from "react"
 import Image from "next/image"
 import { GitHubStats } from "./GitHubStats"
-import { PlaceHolderImages } from "@/lib/placeholder-images"
 
 export function About() {
-  const profilePlaceholder = PlaceHolderImages.find(img => img.id === "about-profile")
-  const [avatarUrl, setAvatarUrl] = React.useState(profilePlaceholder?.imageUrl || "https://images.unsplash.com/photo-1589616710474-78fef3b06aa3")
-
-  React.useEffect(() => {
-    fetch("https://api.github.com/users/codebyTarun08")
-      .then(res => res.json())
-      .then(data => {
-        if (data.avatar_url) {
-          setAvatarUrl(data.avatar_url)
-        }
-      })
-      .catch(err => {
-        // Silently fail and keep the default placeholder image
-      })
-  }, [])
+  // Using the direct download link format for the Google Drive image
+  const profileImageUrl = "https://drive.google.com/uc?id=1F0Fq0HAP00o3e8--9bxEMI-qxzDijqkp"
 
   return (
     <section id="about" className="py-24 bg-secondary/30">
@@ -29,7 +15,7 @@ export function About() {
           <div className="relative reveal">
             <div className="aspect-square rounded-2xl overflow-hidden relative group border-4 border-white dark:border-white/10 shadow-2xl">
               <Image 
-                src={avatarUrl} 
+                src={profileImageUrl} 
                 alt="Tarun Profile" 
                 fill 
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
