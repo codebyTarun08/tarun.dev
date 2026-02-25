@@ -84,7 +84,7 @@ export function ContactSection() {
                 </div>
                 <div>
                   <h4 className="font-semibold text-sm">Location</h4>
-                  <p className="text-muted-foreground">Pune, India</p>
+                  <p className="text-muted-foreground">Noida, India</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -93,7 +93,7 @@ export function ContactSection() {
                 </div>
                 <div>
                   <h4 className="font-semibold text-sm">Email</h4>
-                  <p className="text-muted-foreground">tarun.dev@example.com</p>
+                  <p className="text-muted-foreground">tarunarcade56@gmail.com</p>
                 </div>
               </div>
             </div>
@@ -122,7 +122,7 @@ export function ContactSection() {
                     <FormItem>
                       <FormLabel>Full Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="John Doe" {...field} className="rounded-xl bg-secondary/20 border-transparent focus:border-primary transition-all" />
+                        <Input placeholder="Tarun Kumar" {...field} className="rounded-xl bg-secondary/20 border-transparent focus:border-primary transition-all" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -135,7 +135,7 @@ export function ContactSection() {
                     <FormItem>
                       <FormLabel>Email Address</FormLabel>
                       <FormControl>
-                        <Input placeholder="john@example.com" {...field} className="rounded-xl bg-secondary/20 border-transparent focus:border-primary transition-all" />
+                        <Input placeholder="tk@gmail.com" {...field} className="rounded-xl bg-secondary/20 border-transparent focus:border-primary transition-all" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -6,6 +6,7 @@ import Link from "next/link"
 import { ThemeToggle } from "./ThemeToggle"
 import { cn } from "@/lib/utils"
 import { ResumeButton } from "./ResumeButton"
+import { motion } from "framer-motion"
 
 const navItems = [
   { name: "Home", href: "#home" },
@@ -38,41 +39,50 @@ export function Navbar() {
   }, [])
 
   return (
-    <nav
+    <motion.nav
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5 }}
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        scrolled ? "py-3 glass" : "py-6 bg-transparent"
+        scrolled ? "py-3 glass shadow-lg shadow-primary/5" : "py-6 bg-transparent"
       )}
     >
       <div className="container mx-auto px-6 flex items-center justify-between">
-        <Link href="/" className="text-2xl font-bold tracking-tighter text-primary">
-          DevSphere<span className="text-accent">.</span>
+        <Link href="/" className="text-2xl font-black tracking-tighter text-primary">
+          Tarun<span className="text-accent italic">.</span>
         </Link>
 
-        <div className="hidden md:flex items-center space-x-8">
+        <div className="hidden md:flex items-center space-x-10">
           {navItems.map((item) => (
             <Link
               key={item.name}
               href={item.href}
               onClick={() => setActive(item.name)}
               className={cn(
-                "text-sm font-medium transition-colors hover:text-primary",
+                "text-xs uppercase font-bold tracking-widest transition-all hover:text-primary relative group",
                 active === item.name ? "text-primary" : "text-muted-foreground"
               )}
             >
               {item.name}
+              {active === item.name && (
+                <motion.div 
+                  layoutId="activeNav"
+                  className="absolute -bottom-2 left-0 right-0 h-0.5 bg-primary" 
+                />
+              )}
             </Link>
           ))}
           <div className="h-6 w-px bg-border/50 mx-2" />
-          <ResumeButton variant="ghost" className="h-9 px-4 text-xs" />
+          <ResumeButton variant="ghost" className="h-9 px-4 text-[10px] font-bold uppercase tracking-widest" />
           <ThemeToggle />
         </div>
 
         <div className="md:hidden flex items-center gap-4">
           <ThemeToggle />
-          <ResumeButton variant="outline" className="h-9 px-4 text-[10px]" />
+          <ResumeButton variant="outline" className="h-9 px-4 text-[10px] font-bold uppercase tracking-widest" />
         </div>
       </div>
-    </nav>
+    </motion.nav>
   )
 }
