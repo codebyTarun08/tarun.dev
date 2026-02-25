@@ -3,7 +3,7 @@
 
 import * as React from "react"
 import dynamic from "next/dynamic"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Code2, Loader2 } from "lucide-react"
 import { ResumeButton } from "./ResumeButton"
@@ -31,7 +31,9 @@ export function Hero() {
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
-    setMounted(true);
+    // A slight delay ensures the layout has settled before Spline attempts to initialize its buffer
+    const timer = setTimeout(() => setMounted(true), 200);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -120,9 +122,10 @@ export function Hero() {
           transition={{ duration: 1.2, delay: 0.4, ease: "easeOut" }}
           className="flex-1 w-full h-[50vh] lg:h-full relative mt-12 lg:mt-0"
         >
-          <div className="absolute inset-0 z-0" suppressHydrationWarning>
+          <div className="absolute inset-0 z-0 overflow-hidden">
             {mounted && (
               <Spline 
+                key="spline-hero"
                 scene="https://prod.spline.design/6Wq1Q7YGyWf8Z9lz/scene.splinecode" 
                 className="w-full h-full pointer-events-auto lg:pointer-events-none xl:pointer-events-auto"
               />
