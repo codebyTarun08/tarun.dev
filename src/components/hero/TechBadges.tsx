@@ -3,13 +3,18 @@
 
 import { motion } from "framer-motion"
 
+/**
+ * Technical skill badges that float around the 3D scene.
+ * Fixed durations (dY, dX) are used instead of Math.random() to prevent Next.js hydration mismatches
+ * between server-side rendering and client-side mounting.
+ */
 const BADGES = [
-  { name: "React", top: "10%", left: "20%", delay: 0 },
-  { name: "Next.js", top: "25%", left: "70%", delay: 0.2 },
-  { name: "Python", top: "60%", left: "15%", delay: 0.4 },
-  { name: "XGBoost", top: "80%", left: "60%", delay: 0.6 },
-  { name: "NLP", top: "40%", left: "85%", delay: 0.8 },
-  { name: "MERN", top: "15%", left: "45%", delay: 1.0 },
+  { name: "React", top: "10%", left: "20%", delay: 0, dY: 4.2, dX: 5.1 },
+  { name: "Next.js", top: "25%", left: "70%", delay: 0.2, dY: 5.5, dX: 4.8 },
+  { name: "Python", top: "60%", left: "15%", delay: 0.4, dY: 4.8, dX: 6.2 },
+  { name: "XGBoost", top: "80%", left: "60%", delay: 0.6, dY: 5.1, dX: 5.5 },
+  { name: "NLP", top: "40%", left: "85%", delay: 0.8, dY: 4.5, dX: 5.9 },
+  { name: "MERN", top: "15%", left: "45%", delay: 1.0, dY: 5.8, dX: 4.3 },
 ]
 
 export function TechBadges() {
@@ -29,12 +34,12 @@ export function TechBadges() {
             opacity: { duration: 0.8, delay: badge.delay },
             scale: { duration: 0.5, delay: badge.delay },
             y: {
-              duration: 4 + Math.random() * 2,
+              duration: badge.dY,
               repeat: Infinity,
               ease: "easeInOut",
             },
             x: {
-              duration: 5 + Math.random() * 2,
+              duration: badge.dX,
               repeat: Infinity,
               ease: "easeInOut",
             },
