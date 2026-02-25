@@ -3,6 +3,7 @@
 
 import * as React from "react"
 import { GitCommit, Star, Users, FolderCode } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 const stats = [
   { label: "Repos", value: "45+", icon: FolderCode, color: "text-blue-500" },
@@ -24,5 +25,3 @@ export function GitHubStats() {
     </div>
   )
 }
-
-import { cn } from "@/lib/utils"

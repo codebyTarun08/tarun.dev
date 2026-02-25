@@ -8,18 +8,43 @@ import { ResumeButton } from "./ResumeButton"
 
 export function Hero() {
   const [text, setText] = React.useState("")
-  const fullText = "Building Digital Experiences with Precision."
-  const [index, setIndex] = React.useState(0)
+  const [isDeleting, setIsDeleting] = React.useState(false)
+  const [loopNum, setLoopNum] = React.useState(0)
+  const [typingSpeed, setTypingSpeed] = React.useState(150)
+
+  const phrases = React.useMemo(() => [
+    "Building Digital Experiences with Precision.",
+    "Fullstack & AI Engineering Specialist.",
+    "Turning Complex Ideas into Elegant Code.",
+    "Architecting Scalable Web Solutions."
+  ], [])
 
   React.useEffect(() => {
-    if (index < fullText.length) {
-      const timeout = setTimeout(() => {
-        setText((prev) => prev + fullText.charAt(index))
-        setIndex((prev) => prev + 1)
-      }, 70)
-      return () => clearTimeout(timeout)
+    const handleType = () => {
+      const i = loopNum % phrases.length
+      const fullPhrase = phrases[i]
+
+      if (isDeleting) {
+        setText(fullPhrase.substring(0, text.length - 1))
+        setTypingSpeed(50)
+      } else {
+        setText(fullPhrase.substring(0, text.length + 1))
+        setTypingSpeed(100)
+      }
+
+      if (!isDeleting && text === fullPhrase) {
+        setIsDeleting(true)
+        setTypingSpeed(2000) // Pause at the end
+      } else if (isDeleting && text === "") {
+        setIsDeleting(false)
+        setLoopNum(loopNum + 1)
+        setTypingSpeed(500) // Pause before next phrase
+      }
     }
-  }, [index])
+
+    const timer = setTimeout(handleType, typingSpeed)
+    return () => clearTimeout(timer)
+  }, [text, isDeleting, loopNum, typingSpeed, phrases])
 
   return (
     <section id="home" className="relative min-h-screen flex items-center pt-20 overflow-hidden">
@@ -37,7 +62,7 @@ export function Hero() {
             I&apos;m Tarun, a <span className="text-primary italic">Creative</span> Developer.
           </h1>
           
-          <p className="text-xl md:text-2xl text-muted-foreground mb-10 h-16 md:h-8 typing-animation reveal">
+          <p className="text-xl md:text-2xl text-muted-foreground mb-10 h-24 md:h-12 typing-animation reveal">
             {text}
           </p>
           
