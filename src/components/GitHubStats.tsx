@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -24,7 +25,7 @@ export function GitHubStats() {
         const repos = await reposRes.json()
         
         const totalStars = Array.isArray(repos) 
-          ? repos.reduce((acc: number, repo: any) => acc + repo.stargazers_count, 0)
+          ? repos.reduce((acc: number, repo: any) => acc + (repo.stargazers_count || 0), 0)
           : 0
 
         setData({

@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -7,6 +8,9 @@ import { GitHubStats } from "./GitHubStats"
 export function About() {
   // Using the direct download link format for the Google Drive image
   const profileImageUrl = "https://drive.google.com/uc?id=1F0Fq0HAP00o3e8--9bxEMI-qxzDijqkp"
+  const githubFallbackUrl = "https://github.com/codebyTarun08.png"
+
+  const [imgSrc, setImgSrc] = React.useState(profileImageUrl)
 
   return (
     <section id="about" className="py-24 bg-secondary/30">
@@ -15,11 +19,13 @@ export function About() {
           <div className="relative reveal">
             <div className="aspect-square rounded-2xl overflow-hidden relative group border-4 border-white dark:border-white/10 shadow-2xl">
               <Image 
-                src={profileImageUrl} 
+                src={imgSrc} 
                 alt="Tarun Profile" 
                 fill 
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
                 priority
+                unoptimized // Bypasses Next.js image proxy to avoid issues with Google Drive redirects
+                onError={() => setImgSrc(githubFallbackUrl)}
                 data-ai-hint="developer portrait"
               />
               <div className="absolute inset-0 bg-primary/20 mix-blend-multiply opacity-0 group-hover:opacity-100 transition-opacity" />
