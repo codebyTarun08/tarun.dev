@@ -1,11 +1,13 @@
 
-"use client"
+'use client';
 
 import * as React from "react"
 import { X, Download, ZoomIn, ZoomOut, QrCode, FileText, CheckCircle2 } from "lucide-react"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { QRCodeSVG, QRCodeCanvas } from "qrcode.react"
+import { db } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 interface ResumeModalProps {
   isOpen: boolean
@@ -15,13 +17,30 @@ interface ResumeModalProps {
 export function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
   const [zoom, setZoom] = React.useState(100)
   const [showQR, setShowQR] = React.useState(false)
+  const [resumeUrl, setResumeUrl] = React.useState("/resume.pdf") // Fallback
   const qrRef = React.useRef<HTMLDivElement>(null)
 
+  React.useEffect(() => {
+    async function fetchResumeUrl() {
+      try {
+        const docRef = doc(db, 'portfolioConfig', 'resume');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists() && docSnap.data().resumeUrl) {
+          setResumeUrl(docSnap.data().resumeUrl);
+        }
+      } catch (err) {
+        console.error('Failed to fetch resume URL:', err);
+      }
+    }
+    if (isOpen) {
+      fetchResumeUrl();
+    }
+  }, [isOpen]);
+
   const handleDownload = () => {
-    // In a real app, this would be the path to the PDF on Firebase Storage
-    const resumeUrl = "/resume.pdf" 
     const link = document.createElement("a")
     link.href = resumeUrl
+    link.target = "_blank"
     link.download = "Tarun_Kumar_Fullstack_AI_Resume.pdf"
     document.body.appendChild(link)
     link.click()
@@ -44,7 +63,6 @@ export function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
       <DialogContent className="max-w-[95vw] w-full h-[95vh] p-0 border-none bg-background/80 backdrop-blur-2xl overflow-hidden rounded-3xl shadow-2xl">
         <DialogTitle className="sr-only">Professional Resume Viewer</DialogTitle>
         
-        {/* Sticky Top Bar */}
         <div className="absolute top-0 left-0 right-0 h-16 bg-card/50 backdrop-blur-md border-b border-border/50 flex items-center justify-between px-6 z-50">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-primary/10 text-primary">
@@ -83,16 +101,14 @@ export function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
           </div>
         </div>
 
-        {/* Resume Content Container */}
         <div className="h-full pt-16 flex justify-center bg-muted/30 overflow-auto scrollbar-hide">
           <div 
             className="p-8 transition-all duration-300 origin-top"
             style={{ width: `${zoom}%`, maxWidth: '1000px' }}
           >
-            {/* Embedded PDF Viewer (using iframe for built-in browser functionality) */}
             <div className="w-full aspect-[1/1.414] bg-white rounded-lg shadow-2xl overflow-hidden border border-border/50">
               <iframe 
-                src="/resume.pdf#toolbar=0" 
+                src={`${resumeUrl}#toolbar=0`} 
                 className="w-full h-full border-none"
                 title="Resume PDF"
               />
@@ -100,7 +116,6 @@ export function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
           </div>
         </div>
 
-        {/* QR Code Overlay Panel */}
         {showQR && (
           <div className="absolute top-20 right-6 w-72 bg-card border border-border shadow-2xl rounded-3xl p-6 z-[60] animate-in fade-in slide-in-from-top-4 duration-300">
             <div className="flex justify-between items-start mb-6">

@@ -1,0 +1,56 @@
+
+{
+  "entities": {
+    "ResumeConfig": {
+      "title": "Resume Configuration",
+      "description": "Global configuration for the professional resume link.",
+      "type": "object",
+      "properties": {
+        "resumeUrl": { "type": "string", "format": "uri", "description": "The URL to the hosted PDF resume." },
+        "lastUpdated": { "type": "string", "format": "date-time", "description": "Last time the resume was updated." }
+      },
+      "required": ["resumeUrl"]
+    },
+    "Skill": {
+      "title": "Skill",
+      "description": "A technical skill to display in the marquee rows.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "category": { "type": "string", "enum": ["Frontend", "Backend", "AI", "Tools"] },
+        "icon": { "type": "string", "description": "SVG path or identifier for the skill icon." },
+        "order": { "type": "number" },
+        "visible": { "type": "boolean" }
+      },
+      "required": ["name", "category", "visible"]
+    },
+    "ProjectOverride": {
+      "title": "Project Override",
+      "description": "Custom metadata for GitHub repositories.",
+      "type": "object",
+      "properties": {
+        "featured": { "type": "boolean" },
+        "visible": { "type": "boolean" },
+        "customOrder": { "type": "number" },
+        "customDescription": { "type": "string" }
+      }
+    }
+  },
+  "auth": {
+    "providers": ["google.com"]
+  },
+  "firestore": {
+    "/portfolioConfig/resume": {
+      "schema": { "$ref": "#/backend/entities/ResumeConfig" },
+      "description": "Storage for the main resume URL."
+    },
+    "/skills/{skillId}": {
+      "schema": { "$ref": "#/backend/entities/Skill" },
+      "description": "Collection of technical skills."
+    },
+    "/projectOverrides/{repoName}": {
+      "schema": { "$ref": "#/backend/entities/ProjectOverride" },
+      "description": "Overrides for GitHub projects keyed by repo name."
+    }
+  }
+}

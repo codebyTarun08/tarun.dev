@@ -6,6 +6,8 @@ import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
 import { ProjectCard, Project } from "./ProjectCard"
 import { ProjectModal } from "./ProjectModal"
 import { Button } from "@/components/ui/button"
+import { db } from "@/lib/firebase"
+import { collection, getDocs } from "firebase/firestore"
 
 export function Projects() {
   const [projects, setProjects] = React.useState<Project[]>([])
@@ -19,12 +21,43 @@ export function Projects() {
   React.useEffect(() => {
     const fetchProjects = async () => {
       try {
+        // Fetch GitHub repositories
         const response = await fetch("https://api.github.com/users/codebyTarun08/repos?sort=updated&per_page=100")
-        const data = await response.json()
+        const repoData = await response.json()
         
-        // Filter projects that have a valid live URL (homepage field)
-        const filtered = data.filter((repo: any) => repo.homepage && repo.homepage.trim() !== "")
-        setProjects(filtered)
+        // Fetch Firestore overrides
+        const overrideSnapshot = await getDocs(collection(db, 'projectOverrides'));
+        const overrides: Record<string, any> = {};
+        overrideSnapshot.forEach(doc => {
+          overrides[doc.id] = doc.data();
+        });
+
+        // Merge and Filter
+        const mergedProjects = repoData
+          .map((repo: any) => {
+            const override = overrides[repo.name] || {};
+            return {
+              id: repo.id,
+              name: repo.name,
+              description: override.customDescription || repo.description,
+              topics: repo.topics || [],
+              homepage: repo.homepage,
+              html_url: repo.html_url,
+              language: repo.language,
+              featured: override.featured || false,
+              visible: override.visible !== false,
+              customOrder: override.customOrder ?? 999
+            };
+          })
+          .filter((p: any) => p.visible && (p.homepage || p.featured)) // Show if has homepage OR is featured
+          .sort((a: any, b: any) => {
+            // Priority: Featured -> Custom Order -> GitHub update order
+            if (a.featured && !b.featured) return -1;
+            if (!a.featured && b.featured) return 1;
+            return a.customOrder - b.customOrder;
+          });
+
+        setProjects(mergedProjects)
       } catch (error) {
         console.error("Failed to fetch projects", error)
       } finally {
