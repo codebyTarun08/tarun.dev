@@ -2,12 +2,11 @@
 "use client"
 
 import * as React from "react"
-import { X, ExternalLink, Github, Loader2, BookOpen, Layers } from "lucide-react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { ExternalLink, Github, BookOpen, Layers } from "lucide-react"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Project } from "./ProjectCard"
-import { summarizeProjectReadme } from "@/ai/flows/ai-project-readme-summary-flow"
 
 interface ProjectModalProps {
   project: Project | null
@@ -16,35 +15,6 @@ interface ProjectModalProps {
 }
 
 export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
-  const [summary, setSummary] = React.useState<string | null>(null)
-  const [isLoading, setIsLoading] = React.useState(false)
-
-  React.useEffect(() => {
-    if (project && isOpen) {
-      fetchReadme(project.name)
-    } else {
-      setSummary(null)
-    }
-  }, [project, isOpen])
-
-  const fetchReadme = async (repoName: string) => {
-    setIsLoading(true)
-    try {
-      // For demonstration, fetching actual README from GitHub
-      const res = await fetch(`https://raw.githubusercontent.com/codebyTarun08/${repoName}/main/README.md`)
-      if (!res.ok) throw new Error("Could not find README")
-      const text = await res.text()
-      
-      const aiResponse = await summarizeProjectReadme({ readmeContent: text })
-      setSummary(aiResponse.summary)
-    } catch (error) {
-      console.error(error)
-      setSummary("Unable to generate AI summary at this time.")
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   if (!project) return null
 
   return (
@@ -63,18 +33,11 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
               <section>
                 <div className="flex items-center gap-2 mb-3 text-primary">
                   <BookOpen className="w-4 h-4" />
-                  <h3 className="text-sm font-bold uppercase tracking-widest">AI Project Summary</h3>
+                  <h3 className="text-sm font-bold uppercase tracking-widest">About Project</h3>
                 </div>
-                {isLoading ? (
-                  <div className="flex items-center gap-2 text-muted-foreground italic">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span className="text-sm">Generating AI insights...</span>
-                  </div>
-                ) : (
-                  <p className="text-muted-foreground leading-relaxed">
-                    {summary || "No summary available."}
-                  </p>
-                )}
+                <p className="text-muted-foreground leading-relaxed">
+                  {project.description || "A comprehensive project showcasing advanced software architecture and efficient user interface design."}
+                </p>
               </section>
 
               <section>
@@ -88,7 +51,11 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                       {topic}
                     </Badge>
                   ))}
-                  {!project.topics?.length && <Badge variant="secondary">{project.language}</Badge>}
+                  {!project.topics?.length && project.language && (
+                    <Badge variant="secondary" className="px-3 py-1 rounded-md text-xs">
+                      {project.language}
+                    </Badge>
+                  )}
                 </div>
               </section>
             </div>
@@ -97,12 +64,14 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
               <div className="p-6 rounded-xl bg-secondary/30 border border-border">
                 <h4 className="font-semibold mb-4 text-sm">Quick Links</h4>
                 <div className="flex flex-col gap-3">
-                  <Button variant="default" className="w-full justify-start rounded-lg" asChild>
-                    <a href={project.homepage} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      Live Preview
-                    </a>
-                  </Button>
+                  {project.homepage && (
+                    <Button variant="default" className="w-full justify-start rounded-lg" asChild>
+                      <a href={project.homepage} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Live Preview
+                      </a>
+                    </Button>
+                  )}
                   <Button variant="outline" className="w-full justify-start rounded-lg" asChild>
                     <a href={project.html_url} target="_blank" rel="noopener noreferrer">
                       <Github className="w-4 h-4 mr-2" />
