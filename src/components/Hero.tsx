@@ -28,6 +28,12 @@ const phrases = [
 ]
 
 export function Hero() {
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <section id="home" className="relative h-screen w-full flex items-center overflow-hidden bg-[radial-gradient(circle_at_50%_50%,_rgba(109,40,217,0.15),_rgba(255,255,255,0))] dark:bg-[radial-gradient(circle_at_50%_50%,_rgba(109,40,217,0.2),_rgba(10,10,10,1))]">
       {/* Background Decoration */}
@@ -114,11 +120,13 @@ export function Hero() {
           transition={{ duration: 1.2, delay: 0.4, ease: "easeOut" }}
           className="flex-1 w-full h-[50vh] lg:h-full relative mt-12 lg:mt-0"
         >
-          <div className="absolute inset-0 z-0">
-            <Spline 
-              scene="https://prod.spline.design/6Wq1Q7YGyWf8Z9lz/scene.splinecode" 
-              className="w-full h-full pointer-events-auto lg:pointer-events-none xl:pointer-events-auto"
-            />
+          <div className="absolute inset-0 z-0" suppressHydrationWarning>
+            {mounted && (
+              <Spline 
+                scene="https://prod.spline.design/6Wq1Q7YGyWf8Z9lz/scene.splinecode" 
+                className="w-full h-full pointer-events-auto lg:pointer-events-none xl:pointer-events-auto"
+              />
+            )}
           </div>
           <TechBadges />
         </motion.div>
