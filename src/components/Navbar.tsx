@@ -5,6 +5,7 @@ import * as React from "react"
 import Link from "next/link"
 import { ThemeToggle } from "./ThemeToggle"
 import { cn } from "@/lib/utils"
+import { ResumeButton } from "./ResumeButton"
 
 const navItems = [
   { name: "Home", href: "#home" },
@@ -62,12 +63,14 @@ export function Navbar() {
               {item.name}
             </Link>
           ))}
+          <div className="h-6 w-px bg-border/50 mx-2" />
+          <ResumeButton variant="ghost" className="h-9 px-4 text-xs" />
           <ThemeToggle />
         </div>
 
         <div className="md:hidden flex items-center gap-4">
           <ThemeToggle />
-          {/* Mobile menu could go here if needed, but keeping minimal as requested */}
+          <ResumeButton variant="outline" className="h-9 px-4 text-[10px]" />
         </div>
       </div>
     </nav>

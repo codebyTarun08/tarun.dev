@@ -11,6 +11,12 @@
       "description": "Developer profile illustration",
       "imageUrl": "https://images.unsplash.com/photo-1589616710474-78fef3b06aa3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxkZXZlbG9wZXIlMjBwcm9maWxlfGVufDB8fHx8MTc3MjAwMjA3NHww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "developer profile"
+    },
+    {
+      "id": "resume-thumbnail",
+      "description": "Thumbnail preview of professional resume",
+      "imageUrl": "https://images.unsplash.com/photo-1661237473026-83b6f4ea5706?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxyZXN1bWUlMjBwcmV2aWV3fGVufDB8fHx8MTc3MjAwMzU2OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "resume preview"
     }
   ]
 }

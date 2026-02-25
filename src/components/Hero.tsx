@@ -4,6 +4,7 @@
 import * as React from "react"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Code2 } from "lucide-react"
+import { ResumeButton } from "./ResumeButton"
 
 export function Hero() {
   const [text, setText] = React.useState("")
@@ -40,14 +41,16 @@ export function Hero() {
             {text}
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 reveal">
-            <Button size="lg" className="rounded-full px-8 h-12 bg-primary hover:bg-primary/90">
-              View My Work
-              <ArrowRight className="ml-2 w-4 h-4" />
+          <div className="flex flex-col sm:flex-row items-center gap-6 reveal">
+            <Button size="lg" className="rounded-full px-8 h-12 bg-primary hover:bg-primary/90" asChild>
+              <a href="#projects">
+                View My Work
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </a>
             </Button>
-            <Button size="lg" variant="outline" className="rounded-full px-8 h-12 border-primary/20 hover:bg-primary/5">
-              Contact Me
-            </Button>
+            <div className="flex items-center gap-4">
+              <ResumeButton variant="outline" className="border-primary/20 hover:bg-primary/5" />
+            </div>
           </div>
         </div>
       </div>
