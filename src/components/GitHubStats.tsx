@@ -1,18 +1,53 @@
-
 "use client"
 
 import * as React from "react"
-import { GitCommit, Star, Users, FolderCode } from "lucide-react"
+import { Star, Users, FolderCode, Activity } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-const stats = [
-  { label: "Repos", value: "45+", icon: FolderCode, color: "text-blue-500" },
-  { label: "Stars", value: "120+", icon: Star, color: "text-yellow-500" },
-  { label: "Commits", value: "1.2k", icon: GitCommit, color: "text-green-500" },
-  { label: "Followers", value: "30+", icon: Users, color: "text-purple-500" },
-]
-
 export function GitHubStats() {
+  const [data, setData] = React.useState({
+    repos: "...",
+    stars: "...",
+    followers: "...",
+    following: "..."
+  })
+
+  React.useEffect(() => {
+    const fetchGitHubData = async () => {
+      try {
+        // Fetch basic profile info
+        const profileRes = await fetch("https://api.github.com/users/codebyTarun08")
+        const profile = await profileRes.json()
+
+        // Fetch all repos to count stars (GitHub REST API limit is 100 per page)
+        const reposRes = await fetch("https://api.github.com/users/codebyTarun08/repos?per_page=100")
+        const repos = await reposRes.json()
+        
+        const totalStars = Array.isArray(repos) 
+          ? repos.reduce((acc: number, repo: any) => acc + repo.stargazers_count, 0)
+          : 0
+
+        setData({
+          repos: profile.public_repos?.toString() || "0",
+          stars: totalStars.toString(),
+          followers: profile.followers?.toString() || "0",
+          following: profile.following?.toString() || "0"
+        })
+      } catch (error) {
+        console.error("Failed to fetch GitHub stats:", error)
+      }
+    }
+
+    fetchGitHubData()
+  }, [])
+
+  const stats = [
+    { label: "Repos", value: data.repos, icon: FolderCode, color: "text-blue-500" },
+    { label: "Stars", value: data.stars, icon: Star, color: "text-yellow-500" },
+    { label: "Followers", value: data.followers, icon: Users, color: "text-purple-500" },
+    { label: "Following", value: data.following, icon: Activity, color: "text-green-500" },
+  ]
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
       {stats.map((stat) => (

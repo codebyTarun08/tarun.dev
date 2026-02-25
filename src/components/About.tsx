@@ -7,6 +7,18 @@ import { PlaceHolderImages } from "@/lib/placeholder-images"
 
 export function About() {
   const profileImg = PlaceHolderImages.find(img => img.id === "about-profile")
+  const [avatarUrl, setAvatarUrl] = React.useState(profileImg?.imageUrl || "")
+
+  React.useEffect(() => {
+    fetch("https://api.github.com/users/codebyTarun08")
+      .then(res => res.json())
+      .then(data => {
+        if (data.avatar_url) {
+          setAvatarUrl(data.avatar_url)
+        }
+      })
+      .catch(err => console.error("Error fetching GitHub profile:", err))
+  }, [])
 
   return (
     <section id="about" className="py-24 bg-secondary/30">
@@ -15,11 +27,11 @@ export function About() {
           <div className="relative reveal">
             <div className="aspect-square rounded-2xl overflow-hidden relative group">
               <Image 
-                src={profileImg?.imageUrl || ""} 
-                alt="Profile image" 
+                src={avatarUrl} 
+                alt="Tarun Profile" 
                 fill 
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
-                data-ai-hint="developer profile"
+                priority
               />
               <div className="absolute inset-0 bg-primary/20 mix-blend-multiply opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
