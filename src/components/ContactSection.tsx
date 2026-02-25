@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useToast } from "@/hooks/use-toast"
+import { sendEmailAction } from "@/app/actions/send-email"
 
 const contactFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -37,10 +38,19 @@ export function ContactSection() {
   async function onSubmit(values: z.infer<typeof contactFormSchema>) {
     setIsSubmitting(true)
     try {
+      // 1. Log to Firestore
       await addDoc(collection(db, "contacts"), {
         ...values,
         createdAt: serverTimestamp(),
       })
+
+      // 2. Send Email via Server Action
+      const emailResult = await sendEmailAction(values)
+      
+      if (!emailResult.success) {
+        throw new Error(emailResult.error)
+      }
+
       setIsSuccess(true)
       form.reset()
       setTimeout(() => setIsSuccess(false), 5000)
