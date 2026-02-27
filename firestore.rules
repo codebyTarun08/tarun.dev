@@ -42,7 +42,7 @@ service cloud.firestore {
     }
 
     match /skills/{skillId} {
-      allow get, list: if true; // Allow public reading for now to see changes immediately
+      allow get, list: if true; 
       allow create: if isPortfolioOwner();
       allow update: if isExistingPortfolioOwner();
       allow delete: if isExistingPortfolioOwner();
@@ -56,7 +56,8 @@ service cloud.firestore {
     }
 
     match /contactMessages/{messageId} {
-      allow create: if request.resource.data.id == messageId;
+      // Allow public creation of messages. We remove the ID check as addDoc doesn't mirror ID in body.
+      allow create: if true; 
       allow get, list: if isPortfolioOwner();
       allow update: if isExistingPortfolioOwner();
       allow delete: if isExistingPortfolioOwner();

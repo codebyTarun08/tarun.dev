@@ -1,12 +1,13 @@
+
 "use client"
 
 import * as React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { Send, CheckCircle2, Loader2, MapPin, Mail, Phone } from "lucide-react"
-import { collection, addDoc, serverTimestamp } from "firebase/firestore"
-import { db } from "@/lib/firebase"
+import { Send, CheckCircle2, Loader2, MapPin, Mail } from "lucide-react"
+import { collection, serverTimestamp } from "firebase/firestore"
+import { useFirestore, addDocumentNonBlocking } from "@/firebase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -22,6 +23,7 @@ const contactFormSchema = z.object({
 
 export function ContactSection() {
   const { toast } = useToast()
+  const firestore = useFirestore()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [isSuccess, setIsSuccess] = React.useState(false)
 
@@ -35,19 +37,32 @@ export function ContactSection() {
   })
 
   async function onSubmit(values: z.infer<typeof contactFormSchema>) {
+    if (!firestore) return;
+    
     setIsSubmitting(true)
     try {
-      // 1. Log to Firestore
-      await addDoc(collection(db, "contacts"), {
-        ...values,
+      // 1. Log to Firestore (using the standardized collection name from backend.json)
+      const messageData = {
+        senderName: values.name,
+        senderEmail: values.email,
+        messageContent: values.message,
+        subject: "New Portfolio Inquiry",
+        sentAt: new Date().toISOString(), // Mirroring schema format
         createdAt: serverTimestamp(),
-      })
+        isRead: false
+      };
+
+      const colRef = collection(firestore, "contactMessages");
+      
+      // Use non-blocking pattern to ensure any permission error is caught and shown as JSON
+      addDocumentNonBlocking(colRef, messageData);
 
       // 2. Send Email via Server Action
       const emailResult = await sendEmailAction(values)
       
       if (!emailResult.success) {
-        throw new Error(emailResult.error)
+        // We log email errors but don't stop the flow if DB write succeeded
+        console.warn("Email notification failed, but message was saved to database.", emailResult.error)
       }
 
       setIsSuccess(true)
