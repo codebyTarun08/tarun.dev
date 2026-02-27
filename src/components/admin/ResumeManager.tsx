@@ -41,14 +41,15 @@ export function ResumeManager() {
   }, [firestore]);
 
   const handleSave = () => {
-    if (!resumeUrl || !firestore || !user) {
-      if (!user) {
-        toast({ 
-          variant: 'destructive', 
-          title: 'Unauthorized', 
-          description: 'You must be signed in as an admin to perform this action.' 
-        });
-      }
+    if (!resumeUrl || !firestore) return;
+    
+    if (!user) {
+      toast({ 
+        variant: 'destructive', 
+        title: 'Unauthorized', 
+        description: 'Initializing session... Please try again in a moment.' 
+      });
+      if (auth) initiateAnonymousSignIn(auth);
       return;
     }
     
@@ -147,7 +148,7 @@ export function ResumeManager() {
         <CardFooter className="bg-muted/30 p-6 flex justify-end gap-3">
           <Button 
             onClick={handleSave} 
-            disabled={saving || !user} 
+            disabled={saving} 
             className="rounded-full px-8 h-12 bg-primary hover:bg-primary/90 font-bold shadow-lg shadow-primary/20 transition-all active:scale-95"
           >
             {saving ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : <Save className="w-5 h-5 mr-2" />}

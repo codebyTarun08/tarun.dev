@@ -18,15 +18,11 @@ service cloud.firestore {
 
     /**
      * @description Determines if the authenticated user is the registered portfolio owner.
-     * For the initial setup phase, we also allow authenticated users to write to skills 
-     * to facilitate easier prototyping.
+     * During the prototyping phase, we allow any signed-in user to act as an admin to 
+     * facilitate easier setup of the initial configuration.
      */
     function isPortfolioOwner() {
-      return isSignedIn() && (
-        exists(/databases/$(database)/documents/app_roles/portfolioOwners/$(request.auth.uid)) ||
-        // Temporary: Allow any signed-in user during early development if the role doc doesn't exist yet
-        !exists(/databases/$(database)/documents/app_roles/portfolioOwners/$(request.auth.uid))
-      );
+      return isSignedIn();
     }
 
     function isExistingPortfolioOwner() {
@@ -56,7 +52,7 @@ service cloud.firestore {
     }
 
     match /contactMessages/{messageId} {
-      // Allow public creation of messages. We remove the ID check as addDoc doesn't mirror ID in body.
+      // Allow public creation of messages.
       allow create: if true; 
       allow get, list: if isPortfolioOwner();
       allow update: if isExistingPortfolioOwner();
