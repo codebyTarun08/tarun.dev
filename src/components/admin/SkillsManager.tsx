@@ -40,7 +40,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Plus, Edit2, Trash2, Loader2, GripVertical, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit2, Trash2, Loader2, GripVertical, Image as ImageIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -62,7 +62,10 @@ export function SkillsManager() {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [isSaving, setIsSaving] = React.useState(false);
   const [currentSkill, setCurrentSkill] = React.useState<Partial<Skill> | null>(null);
+  const [currentPage, setCurrentPage] = React.useState(1);
   const { toast } = useToast();
+
+  const skillsPerPage = 10;
 
   const fetchSkills = React.useCallback(async () => {
     if (!firestore) return;
@@ -82,6 +85,12 @@ export function SkillsManager() {
   React.useEffect(() => {
     fetchSkills();
   }, [fetchSkills]);
+
+  // Pagination Logic
+  const indexOfLastSkill = currentPage * skillsPerPage;
+  const indexOfFirstSkill = indexOfLastSkill - skillsPerPage;
+  const currentSkills = skills.slice(indexOfFirstSkill, indexOfLastSkill);
+  const totalPages = Math.ceil(skills.length / skillsPerPage);
 
   const handleOpenDialog = (skill?: Skill) => {
     setCurrentSkill(skill || { 
@@ -174,54 +183,82 @@ export function SkillsManager() {
         </Button>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-12"></TableHead>
-              <TableHead>Skill</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {skills.map((skill) => (
-              <TableRow key={skill.id} className="group">
-                <TableCell><GripVertical className="w-4 h-4 text-muted-foreground/30" /></TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-secondary/50 p-1.5 overflow-hidden flex items-center justify-center">
-                      {skill.icon ? (
-                        <img src={skill.icon} alt={skill.name} className="w-full h-full object-contain" />
-                      ) : (
-                        <ImageIcon className="w-4 h-4 text-muted-foreground" />
-                      )}
-                    </div>
-                    <span className="font-semibold">{skill.name}</span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="secondary" className="shadow-sm">{skill.category}</Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={skill.visible ? "default" : "outline"} className="shadow-sm">
-                    {skill.visible ? 'Visible' : 'Hidden'}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(skill)} className="rounded-full">
-                      <Edit2 className="w-4 h-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 rounded-full" onClick={() => handleDeleteSkill(skill.id)}>
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </TableCell>
+        <div className="space-y-4">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-12"></TableHead>
+                <TableHead>Skill</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {currentSkills.map((skill) => (
+                <TableRow key={skill.id} className="group">
+                  <TableCell><GripVertical className="w-4 h-4 text-muted-foreground/30" /></TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-secondary/50 p-1.5 overflow-hidden flex items-center justify-center">
+                        {skill.icon ? (
+                          <img src={skill.icon} alt={skill.name} className="w-full h-full object-contain" />
+                        ) : (
+                          <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                        )}
+                      </div>
+                      <span className="font-semibold">{skill.name}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="secondary" className="shadow-sm">{skill.category}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={skill.visible ? "default" : "outline"} className="shadow-sm">
+                      {skill.visible ? 'Visible' : 'Hidden'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(skill)} className="rounded-full">
+                        <Edit2 className="w-4 h-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 rounded-full" onClick={() => handleDeleteSkill(skill.id)}>
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-4 py-4">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="rounded-full h-9 w-9"
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+              <span className="text-xs font-medium tracking-widest uppercase">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="rounded-full h-9 w-9"
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+                disabled={currentPage === totalPages}
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+          )}
+        </div>
       </CardContent>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
