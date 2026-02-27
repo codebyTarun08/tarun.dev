@@ -19,7 +19,7 @@ export function AnimatedBackground() {
   return (
     <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
       {/* Base Grid Pattern - Increased opacity and visibility */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808033_1px,transparent_1px),linear-gradient(to_bottom,#80808033_1px,transparent_1px)] bg-[size:60px_60px] md:bg-[size:80px_80px] [mask-image:radial-gradient(ellipse_90%_90%_at_50%_50%,#000_70%,transparent_100%)] opacity-60 dark:opacity-30" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808033_1px,transparent_1px),linear-gradient(to_bottom,#80808033_1px,transparent_1px)] bg-[size:60px_60px] md:bg-[size:80px_80px] [mask-image:radial-gradient(ellipse_90%_90%_at_50%_50%,#000_70%,transparent_100%)] opacity-70 dark:opacity-50" />
 
       {/* Animated Auras */}
       <motion.div
