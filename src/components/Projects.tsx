@@ -1,81 +1,81 @@
 
-"use client"
+'use client';
 
-import * as React from "react"
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
-import { ProjectCard, Project } from "./ProjectCard"
-import { ProjectModal } from "./ProjectModal"
-import { Button } from "@/components/ui/button"
-import { db } from "@/lib/firebase"
-import { collection, getDocs } from "firebase/firestore"
+import * as React from 'react';
+import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { ProjectCard, Project } from './ProjectCard';
+import { ProjectModal } from './ProjectModal';
+import { Button } from '@/components/ui/button';
+import { useFirestore } from '@/firebase';
+import { collection, getDocs } from 'firebase/firestore';
 
 export function Projects() {
-  const [projects, setProjects] = React.useState<Project[]>([])
-  const [loading, setLoading] = React.useState(true)
-  const [currentPage, setCurrentPage] = React.useState(1)
-  const [selectedProject, setSelectedProject] = React.useState<Project | null>(null)
-  const [modalOpen, setModalOpen] = React.useState(false)
+  const firestore = useFirestore();
+  const [projects, setProjects] = React.useState<Project[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [selectedProject, setSelectedProject] = React.useState<Project | null>(null);
+  const [modalOpen, setModalOpen] = React.useState(false);
   
-  const projectsPerPage = 6
+  const projectsPerPage = 6;
 
-  React.useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        // Fetch GitHub repositories
-        const response = await fetch("https://api.github.com/users/codebyTarun08/repos?sort=updated&per_page=100")
-        const repoData = await response.json()
-        
-        // Fetch Firestore overrides
-        const overrideSnapshot = await getDocs(collection(db, 'projectOverrides'));
-        const overrides: Record<string, any> = {};
-        overrideSnapshot.forEach(doc => {
-          overrides[doc.id] = doc.data();
+  const fetchProjects = React.useCallback(async () => {
+    if (!firestore) return;
+    try {
+      const response = await fetch("https://api.github.com/users/codebyTarun08/repos?sort=updated&per_page=100");
+      const repoData = await response.json();
+      
+      const overrideSnapshot = await getDocs(collection(firestore, 'projectOverrides'));
+      const overrides: Record<string, any> = {};
+      overrideSnapshot.forEach(doc => {
+        overrides[doc.id] = doc.data();
+      });
+
+      const mergedProjects = repoData
+        .map((repo: any) => {
+          const override = overrides[repo.name] || {};
+          return {
+            id: repo.id,
+            name: repo.name,
+            description: override.customDescription || repo.description,
+            topics: repo.topics || [],
+            homepage: repo.homepage,
+            html_url: repo.html_url,
+            language: repo.language,
+            featured: override.featured || false,
+            visible: override.visible !== false,
+            customOrder: override.customOrder ?? 999,
+            techStack: override.techStack || []
+          };
+        })
+        .filter((p: any) => p.visible && (p.homepage || p.featured))
+        .sort((a: any, b: any) => {
+          if (a.featured && !b.featured) return -1;
+          if (!a.featured && b.featured) return 1;
+          return a.customOrder - b.customOrder;
         });
 
-        // Merge and Filter
-        const mergedProjects = repoData
-          .map((repo: any) => {
-            const override = overrides[repo.name] || {};
-            return {
-              id: repo.id,
-              name: repo.name,
-              description: override.customDescription || repo.description,
-              topics: repo.topics || [],
-              homepage: repo.homepage,
-              html_url: repo.html_url,
-              language: repo.language,
-              featured: override.featured || false,
-              visible: override.visible !== false,
-              customOrder: override.customOrder ?? 999
-            };
-          })
-          .filter((p: any) => p.visible && (p.homepage || p.featured)) // Show if has homepage OR is featured
-          .sort((a: any, b: any) => {
-            // Priority: Featured -> Custom Order -> GitHub update order
-            if (a.featured && !b.featured) return -1;
-            if (!a.featured && b.featured) return 1;
-            return a.customOrder - b.customOrder;
-          });
-
-        setProjects(mergedProjects)
-      } catch (error) {
-        console.error("Failed to fetch projects", error)
-      } finally {
-        setLoading(false)
-      }
+      setProjects(mergedProjects);
+    } catch (error) {
+      console.error("Failed to fetch projects", error);
+    } finally {
+      setLoading(false);
     }
-    fetchProjects()
-  }, [])
+  }, [firestore]);
 
-  const indexOfLastProject = currentPage * projectsPerPage
-  const indexOfFirstProject = indexOfLastProject - projectsPerPage
-  const currentProjects = projects.slice(indexOfFirstProject, indexOfLastProject)
-  const totalPages = Math.ceil(projects.length / projectsPerPage)
+  React.useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
+
+  const indexOfLastProject = currentPage * projectsPerPage;
+  const indexOfFirstProject = indexOfLastProject - projectsPerPage;
+  const currentProjects = projects.slice(indexOfFirstProject, indexOfLastProject);
+  const totalPages = Math.ceil(projects.length / projectsPerPage);
 
   const handleOpenDetails = (project: Project) => {
-    setSelectedProject(project)
-    setModalOpen(true)
-  }
+    setSelectedProject(project);
+    setModalOpen(true);
+  };
 
   return (
     <section id="projects" className="py-24">
@@ -140,5 +140,5 @@ export function Projects() {
         onClose={() => setModalOpen(false)} 
       />
     </section>
-  )
+  );
 }
