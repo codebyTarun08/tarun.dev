@@ -40,7 +40,7 @@ export function Footer() {
               <Twitter className="w-5 h-5" />
             </a>
             <a 
-              href="https://www.linkedin.com/in/tarun-kumar-98a0b0267/" 
+              href="https://www.linkedin.com/in/tarun-kumar-883625293/" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="p-2 rounded-full hover:bg-primary/10 transition-colors"
