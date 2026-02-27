@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 
 /**
  * A high-performance animated background inspired by React Bits components.
- * Combines a subtle grid, animated radial gradients (auras), and floating particles.
+ * Combines a prominent grid, animated radial gradients (auras), and floating particles.
  */
 export function AnimatedBackground() {
   const [mounted, setMounted] = React.useState(false)
@@ -18,8 +18,8 @@ export function AnimatedBackground() {
 
   return (
     <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-      {/* Base Grid Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
+      {/* Base Grid Pattern - Increased opacity and visibility */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808033_1px,transparent_1px),linear-gradient(to_bottom,#80808033_1px,transparent_1px)] bg-[size:60px_60px] md:bg-[size:80px_80px] [mask-image:radial-gradient(ellipse_90%_90%_at_50%_50%,#000_70%,transparent_100%)] opacity-60 dark:opacity-30" />
 
       {/* Animated Auras */}
       <motion.div
@@ -51,7 +51,7 @@ export function AnimatedBackground() {
         className="absolute -bottom-[10%] -right-[10%] w-[60%] h-[60%] rounded-full bg-accent/20 blur-[140px]"
       />
 
-      {/* Floating Particles (React Bits style) */}
+      {/* Floating Particles */}
       <div className="absolute inset-0">
         {[...Array(20)].map((_, i) => (
           <motion.div
@@ -63,7 +63,7 @@ export function AnimatedBackground() {
             }}
             animate={{ 
               y: [null, "-100%"],
-              opacity: [0, 0.4, 0]
+              opacity: [0.2, 0.8, 0.2]
             }}
             transition={{
               duration: 10 + Math.random() * 10,
