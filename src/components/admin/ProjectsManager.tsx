@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Save, ChevronLeft, ChevronRight, Plus, Trash2, Cpu, ExternalLink } from 'lucide-react';
+import { Loader2, Save, ChevronLeft, ChevronRight, Plus, Trash2, Cpu, ExternalLink, Settings2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Dialog, 
@@ -55,6 +55,7 @@ export function ProjectsManager() {
   const [currentPage, setCurrentPage] = React.useState(1);
   const [savingId, setSavingId] = React.useState<string | null>(null);
   const [techEditingRepo, setTechEditingRepo] = React.useState<string | null>(null);
+  const [detailsEditingRepo, setDetailsEditingRepo] = React.useState<string | null>(null);
   const { toast } = useToast();
   
   const reposPerPage = 6;
@@ -89,7 +90,7 @@ export function ProjectsManager() {
     setOverrides(prev => ({
       ...prev,
       [repoName]: {
-        ...(prev[repoName] || { id: repoName, visible: true, featured: false, techStack: [] }),
+        ...(prev[repoName] || { id: repoName, visible: true, featured: false, techStack: [], customOrder: 999 }),
         [field]: value
       }
     }));
@@ -153,6 +154,7 @@ export function ProjectsManager() {
                   <TableHead>Repository</TableHead>
                   <TableHead>Featured</TableHead>
                   <TableHead>Visible</TableHead>
+                  <TableHead>Details</TableHead>
                   <TableHead>Tech Stack</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -183,10 +185,21 @@ export function ProjectsManager() {
                           variant="outline" 
                           size="sm" 
                           className="gap-2 rounded-full"
+                          onClick={() => setDetailsEditingRepo(repo.name)}
+                        >
+                          <Settings2 className="w-3.5 h-3.5" />
+                          Settings
+                        </Button>
+                      </TableCell>
+                      <TableCell>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="gap-2 rounded-full"
                           onClick={() => setTechEditingRepo(repo.name)}
                         >
                           <Cpu className="w-3.5 h-3.5" />
-                          {override.techStack?.length || 0} Technologies
+                          {override.techStack?.length || 0}
                         </Button>
                       </TableCell>
                       <TableCell className="text-right">
@@ -218,6 +231,64 @@ export function ProjectsManager() {
           </div>
         </CardContent>
       </Card>
+
+      {/* General Details Dialog */}
+      <Dialog open={!!detailsEditingRepo} onOpenChange={(open) => !open && setDetailsEditingRepo(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>General Settings: {detailsEditingRepo}</DialogTitle>
+            <DialogDescription>Override descriptions and set display order for this project.</DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-bold">Custom Description</Label>
+              <Textarea 
+                placeholder="Write a custom description for this project..."
+                value={detailsEditingRepo ? (overrides[detailsEditingRepo]?.customDescription || '') : ''}
+                onChange={(e) => detailsEditingRepo && handleUpdateOverride(detailsEditingRepo, 'customDescription', e.target.value)}
+                className="min-h-[120px] rounded-xl resize-none"
+              />
+              <p className="text-[10px] text-muted-foreground italic">If left empty, the original GitHub description will be used.</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label className="text-sm font-bold">Display Order</Label>
+                <Input 
+                  type="number"
+                  placeholder="999"
+                  value={detailsEditingRepo ? (overrides[detailsEditingRepo]?.customOrder ?? 999) : 999}
+                  onChange={(e) => detailsEditingRepo && handleUpdateOverride(detailsEditingRepo, 'customOrder', parseInt(e.target.value) || 0)}
+                  className="rounded-xl"
+                />
+                <p className="text-[10px] text-muted-foreground">Lower numbers appear first.</p>
+              </div>
+              <div className="space-y-2 flex flex-col justify-end">
+                <div className="flex items-center justify-between p-2.5 rounded-xl border bg-secondary/10">
+                   <Label className="text-xs font-bold">Featured Project</Label>
+                   <Switch 
+                      checked={detailsEditingRepo ? (overrides[detailsEditingRepo]?.featured || false) : false} 
+                      onCheckedChange={(val) => detailsEditingRepo && handleUpdateOverride(detailsEditingRepo, 'featured', val)} 
+                    />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="bg-muted/30 p-6 rounded-b-lg gap-2">
+            <Button 
+              className="rounded-full px-8"
+              onClick={() => {
+                if (detailsEditingRepo) handleSaveOverride(detailsEditingRepo);
+                setDetailsEditingRepo(null);
+              }}
+            >
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Tech Stack Management Dialog */}
       <Dialog open={!!techEditingRepo} onOpenChange={(open) => !open && setTechEditingRepo(null)}>
@@ -317,3 +388,4 @@ export function ProjectsManager() {
     </div>
   );
 }
+
