@@ -18,6 +18,8 @@ const phrases = [
 
 export function Hero() {
   const profileImageUrl = "https://drive.google.com/uc?id=1F0Fq0HAP00o3e8--9bxEMI-qxzDijqkp"
+  const githubFallbackUrl = "https://github.com/codebyTarun08.png"
+  const [imgSrc, setImgSrc] = React.useState(profileImageUrl)
 
   return (
     <section id="home" className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_50%_50%,_rgba(109,40,217,0.15),_rgba(255,255,255,0))] dark:bg-[radial-gradient(circle_at_50%_50%,_rgba(109,40,217,0.2),_rgba(10,10,10,1))]">
@@ -27,7 +29,7 @@ export function Hero() {
         <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[120px] pointer-events-none" />
       </div>
 
-      <div className="container mx-auto px-6 z-10 pt-32 pb-20 flex flex-col items-center text-center">
+      <div className="container mx-auto px-6 z-10 pt-32 pb-32 flex flex-col items-center text-center">
         {/* Profile Image */}
         <motion.div
           initial={{ opacity: 0, scale: 0.5 }}
@@ -35,14 +37,16 @@ export function Hero() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="relative mb-8"
         >
-          <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-white dark:border-white/10 shadow-2xl relative">
+          <div className="w-32 h-32 md:w-44 md:h-44 rounded-full overflow-hidden border-4 border-white dark:border-white/10 shadow-2xl relative">
             <Image
-              src={profileImageUrl}
+              src={imgSrc}
               alt="Tarun Profile"
               fill
               className="object-cover"
               priority
               unoptimized
+              onError={() => setImgSrc(githubFallbackUrl)}
+              data-ai-hint="developer portrait"
             />
           </div>
           <div className="absolute -inset-2 bg-primary/20 rounded-full blur-xl -z-10 animate-pulse" />
@@ -53,7 +57,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="max-w-4xl"
+          className="max-w-5xl"
         >
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -69,10 +73,10 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-8 leading-[0.9]"
+            className="text-5xl md:text-8xl lg:text-9xl font-black tracking-tighter mb-8 leading-[0.85] md:leading-[0.9]"
           >
             I&apos;m Tarun, a <br />
-            <span className="text-primary italic relative">
+            <span className="text-primary italic relative inline-block">
               Creative
               <motion.svg
                 viewBox="0 0 200 20"
@@ -124,7 +128,7 @@ export function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5, duration: 1 }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-20"
       >
         <span className="text-[10px] uppercase font-bold tracking-[0.3em] text-muted-foreground">Scroll Down</span>
         <motion.div 
