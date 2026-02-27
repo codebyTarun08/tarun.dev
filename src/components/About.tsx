@@ -38,7 +38,7 @@ export function About() {
               <h2 className="text-sm font-bold text-primary uppercase tracking-[0.3em] mb-4 drop-shadow-sm">About Me</h2>
               <h3 className="text-4xl font-bold mb-6 drop-shadow-sm">Crafting Digital Excellence Through Clean Code.</h3>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                I am a full-stack developer based in Pune, India, passionate about building high-performance web applications that provide exceptional user experiences. With expertise in the modern web ecosystem, I bridge the gap between complex engineering and elegant design.
+                I am a full-stack developer based in Noida, India, passionate about building high-performance web applications that provide exceptional user experiences. With expertise in the modern web ecosystem, I bridge the gap between complex engineering and elegant design.
               </p>
             </div>
 

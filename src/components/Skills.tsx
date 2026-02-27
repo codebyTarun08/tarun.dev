@@ -115,9 +115,9 @@ export function Skills() {
             <MarqueeRow skills={skillsByRow.r3} direction="right" speed="45s" />
           </>
         ) : (
-          <div className="flex justify-center py-20">
+          <div className="flex flex-col items-center gap-3 justify-center py-20">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-            <p>Loading...</p>
+            <p>Fetching Skills from Profile</p>
           </div>
         )}
       </div>
