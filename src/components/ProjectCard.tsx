@@ -33,13 +33,13 @@ export function ProjectCard({ project, onOpenDetails }: ProjectCardProps) {
       className="group relative h-full"
     >
       {/* Glow Effect on Hover */}
-      <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-accent rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500" />
+      <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-accent rounded-2xl blur opacity-0 group-hover:opacity-30 transition duration-500" />
       
-      <div className="relative h-full flex flex-col bg-card/50 backdrop-blur-xl border border-border/50 rounded-2xl overflow-hidden shadow-xl group-hover:shadow-primary/10 transition-all duration-500">
+      <div className="relative h-full flex flex-col bg-card border border-border rounded-2xl overflow-hidden shadow-xl transition-all duration-500">
         
         {/* Card Header with Icon and Actions */}
         <div className="p-6 pb-0 flex justify-between items-start">
-          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-inner">
+          <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center text-primary border border-primary/30 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-sm">
             <Code2 className="w-6 h-6" />
           </div>
           <div className="flex gap-1.5">
@@ -84,7 +84,7 @@ export function ProjectCard({ project, onOpenDetails }: ProjectCardProps) {
                   <Badge 
                     key={topic} 
                     variant="secondary" 
-                    className="bg-primary/5 text-primary border-primary/10 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5"
+                    className="bg-primary/15 text-primary border-primary/20 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5"
                   >
                     {topic}
                   </Badge>
@@ -92,7 +92,7 @@ export function ProjectCard({ project, onOpenDetails }: ProjectCardProps) {
               ) : (
                 <Badge 
                   variant="secondary" 
-                  className="bg-accent/5 text-accent border-accent/10 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5"
+                  className="bg-accent/15 text-accent border-accent/20 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5"
                 >
                   {project.language || "Web Project"}
                 </Badge>
@@ -101,7 +101,7 @@ export function ProjectCard({ project, onOpenDetails }: ProjectCardProps) {
 
             <Button 
               onClick={() => onOpenDetails(project)}
-              className="w-full rounded-xl bg-secondary hover:bg-primary hover:text-white border-transparent transition-all duration-300 font-bold flex items-center justify-center gap-2 group/btn"
+              className="w-full rounded-xl bg-secondary text-secondary-foreground hover:bg-primary hover:text-white border border-border hover:border-transparent transition-all duration-300 font-bold flex items-center justify-center gap-2 group/btn"
             >
               <Info className="w-4 h-4 transition-transform group-hover/btn:rotate-12" />
               Project Insights
@@ -110,7 +110,7 @@ export function ProjectCard({ project, onOpenDetails }: ProjectCardProps) {
         </div>
 
         {/* Bottom Decorative Line */}
-        <div className="h-1 w-0 bg-gradient-to-r from-primary to-accent group-hover:w-full transition-all duration-700" />
+        <div className="h-1.5 w-0 bg-gradient-to-r from-primary to-accent group-hover:w-full transition-all duration-700" />
       </div>
     </motion.div>
   )
