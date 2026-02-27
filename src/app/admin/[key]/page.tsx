@@ -8,12 +8,16 @@ import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { ResumeManager } from '@/components/admin/ResumeManager';
 import { SkillsManager } from '@/components/admin/SkillsManager';
 import { ProjectsManager } from '@/components/admin/ProjectsManager';
-import { LayoutDashboard, FileText, Code, FolderGit2 } from 'lucide-react';
+import { LayoutDashboard, FileText, Code, FolderGit2, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { useAuth, useUser } from '@/firebase';
+import { signInAnonymously } from 'firebase/auth';
 
 export default function AdminPanel() {
   const params = useParams();
   const router = useRouter();
+  const auth = useAuth();
+  const { user, isUserLoading } = useUser();
   const [activeTab, setActiveTab] = React.useState('resume');
   const [isAuthorized, setIsAuthorized] = React.useState(false);
 
@@ -24,8 +28,12 @@ export default function AdminPanel() {
       router.push('/');
     } else {
       setIsAuthorized(true);
+      // Automatically sign in anonymously if authorized via secret but not yet in Firebase
+      if (!isUserLoading && !user && auth) {
+        signInAnonymously(auth).catch(console.error);
+      }
     }
-  }, [params.key, secret, router]);
+  }, [params.key, secret, router, user, isUserLoading, auth]);
 
   if (!isAuthorized) return null;
 
@@ -60,6 +68,7 @@ export default function AdminPanel() {
             {activeTab === 'skills' && <Code className="w-4 h-4" />}
             {activeTab === 'projects' && <FolderGit2 className="w-4 h-4" />}
             <span className="capitalize">{activeTab} Management</span>
+            {isUserLoading && <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />}
           </div>
         </header>
         <main className="p-6">
