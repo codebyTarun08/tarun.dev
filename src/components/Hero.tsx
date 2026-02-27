@@ -2,23 +2,12 @@
 "use client"
 
 import * as React from "react"
-import dynamic from "next/dynamic"
 import { motion } from "framer-motion"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Code2, Loader2 } from "lucide-react"
+import { ArrowRight, Code2 } from "lucide-react"
 import { ResumeButton } from "./ResumeButton"
 import { TypingText } from "./hero/TypingText"
-import { TechBadges } from "./hero/TechBadges"
-
-// Dynamic import for Spline to prevent SSR issues and optimize performance
-const Spline = dynamic(() => import("@splinetool/react-spline"), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center w-full h-full">
-      <Loader2 className="w-10 h-10 animate-spin text-primary opacity-20" />
-    </div>
-  ),
-})
 
 const phrases = [
   "Building Digital Experiences with Precision.",
@@ -28,29 +17,43 @@ const phrases = [
 ]
 
 export function Hero() {
-  const [mounted, setMounted] = React.useState(false);
-
-  React.useEffect(() => {
-    // A slight delay ensures the layout has settled before Spline attempts to initialize its buffer
-    const timer = setTimeout(() => setMounted(true), 500);
-    return () => clearTimeout(timer);
-  }, []);
+  const profileImageUrl = "https://drive.google.com/uc?id=1F0Fq0HAP00o3e8--9bxEMI-qxzDijqkp"
 
   return (
-    <section id="home" className="relative h-screen w-full flex items-center overflow-hidden bg-[radial-gradient(circle_at_50%_50%,_rgba(109,40,217,0.15),_rgba(255,255,255,0))] dark:bg-[radial-gradient(circle_at_50%_50%,_rgba(109,40,217,0.2),_rgba(10,10,10,1))]">
+    <section id="home" className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_50%_50%,_rgba(109,40,217,0.15),_rgba(255,255,255,0))] dark:bg-[radial-gradient(circle_at_50%_50%,_rgba(109,40,217,0.2),_rgba(10,10,10,1))]">
       {/* Background Decoration */}
       <div className="absolute top-0 left-0 w-full h-full -z-10 overflow-hidden">
-        <div className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-1/4 -right-20 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[120px] pointer-events-none" />
       </div>
 
-      <div className="container mx-auto px-6 h-full flex flex-col lg:flex-row items-center justify-between z-10 pt-20">
-        {/* Left Content */}
-        <motion.div 
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
+      <div className="container mx-auto px-6 z-10 pt-32 pb-20 flex flex-col items-center text-center">
+        {/* Profile Image */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="flex-1 max-w-2xl text-center lg:text-left z-30"
+          className="relative mb-8"
+        >
+          <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-white dark:border-white/10 shadow-2xl relative">
+            <Image
+              src={profileImageUrl}
+              alt="Tarun Profile"
+              fill
+              className="object-cover"
+              priority
+              unoptimized
+            />
+          </div>
+          <div className="absolute -inset-2 bg-primary/20 rounded-full blur-xl -z-10 animate-pulse" />
+        </motion.div>
+
+        {/* Content */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="max-w-4xl"
         >
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -66,7 +69,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="text-6xl md:text-8xl font-black tracking-tighter mb-8 leading-[0.9]"
+            className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-8 leading-[0.9]"
           >
             I&apos;m Tarun, a <br />
             <span className="text-primary italic relative">
@@ -88,7 +91,7 @@ export function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="h-24 md:h-12 mb-12"
+            className="h-20 md:h-12 mb-12"
           >
             <TypingText phrases={phrases} />
           </motion.div>
@@ -97,7 +100,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
-            className="flex flex-col sm:flex-row items-center gap-6 justify-center lg:justify-start"
+            className="flex flex-col sm:flex-row items-center gap-6 justify-center"
           >
             <Button 
               size="lg" 
@@ -113,25 +116,6 @@ export function Hero() {
               <ResumeButton variant="outline" className="border-primary/30 h-14 px-10 rounded-full hover:bg-primary/5 hover:scale-105 transition-all" />
             </div>
           </motion.div>
-        </motion.div>
-
-        {/* Right Content - 3D Scene */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.2, delay: 0.4, ease: "easeOut" }}
-          className="flex-1 w-full h-[50vh] lg:h-full relative mt-12 lg:mt-0"
-        >
-          <div className="absolute inset-0 z-0 overflow-hidden">
-            {mounted && (
-              <Spline 
-                key="spline-hero"
-                scene="https://prod.spline.design/6Wq1Q7YGyWf8Z9lz/scene.splinecode" 
-                className="w-full h-full pointer-events-auto lg:pointer-events-none xl:pointer-events-auto"
-              />
-            )}
-          </div>
-          <TechBadges />
         </motion.div>
       </div>
 
