@@ -3,35 +3,36 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { db } from "@/lib/firebase"
-import { collection, getDocs, query, orderBy, where } from "firebase/firestore"
+import { useFirestore } from "@/firebase"
+import { collection, getDocs } from "firebase/firestore"
 
 interface Skill {
   name: string
   icon: string
   category: string
   color?: string
+  visible?: boolean
+  order?: number
 }
 
 const DEFAULT_SKILLS: Skill[] = [
-  { name: "React", category: "Frontend", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" },
-  { name: "Next.js", category: "Frontend", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" },
-  { name: "TypeScript", category: "Frontend", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" },
-  { name: "Tailwind", category: "Frontend", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" },
-  { name: "Node.js", category: "Backend", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" },
-  { name: "Firebase", category: "Tools", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firebase/firebase-plain.svg" },
-  { name: "Python", category: "Backend", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" },
-  { name: "GitHub", category: "Tools", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" },
-  { name: "Docker", category: "Tools", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" },
-  { name: "Figma", category: "Tools", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg" },
-  { name: "PostgreSQL", category: "Backend", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" },
-  { name: "Redux", category: "Frontend", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redux/redux-original.svg" },
+  { name: "React", category: "Frontend", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg", order: 1, visible: true },
+  { name: "Next.js", category: "Frontend", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg", order: 2, visible: true },
+  { name: "TypeScript", category: "Frontend", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg", order: 3, visible: true },
+  { name: "Tailwind", category: "Frontend", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg", order: 4, visible: true },
+  { name: "Node.js", category: "Backend", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg", order: 5, visible: true },
+  { name: "Firebase", category: "Tools", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firebase/firebase-plain.svg", order: 6, visible: true },
+  { name: "Python", category: "Backend", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg", order: 7, visible: true },
+  { name: "GitHub", category: "Tools", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg", order: 8, visible: true },
+  { name: "Docker", category: "Tools", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg", order: 9, visible: true },
+  { name: "Figma", category: "Tools", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg", order: 10, visible: true },
+  { name: "PostgreSQL", category: "Backend", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg", order: 11, visible: true },
+  { name: "Redux", category: "Frontend", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redux/redux-original.svg", order: 12, visible: true },
 ];
 
 function MarqueeRow({ skills, direction, speed }: { skills: Skill[], direction: 'left' | 'right', speed: string }) {
   if (skills.length === 0) return null;
   
-  // Multiply skills to ensure enough coverage for a smooth loop
   const duplicatedSkills = [...skills, ...skills, ...skills, ...skills]
 
   return (
@@ -49,7 +50,6 @@ function MarqueeRow({ skills, direction, speed }: { skills: Skill[], direction: 
             className="flex items-center gap-4 px-8 py-5 rounded-2xl bg-card border border-border/50 shadow-sm hover:border-primary/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-default"
           >
             <div className="w-10 h-10 flex items-center justify-center transition-transform group-hover:scale-110">
-              {/* Support both SVG paths and Image URLs */}
               {skill.icon.startsWith('<svg') ? (
                 <div dangerouslySetInnerHTML={{ __html: skill.icon }} className="w-full h-full text-primary fill-current" />
               ) : (
@@ -65,19 +65,24 @@ function MarqueeRow({ skills, direction, speed }: { skills: Skill[], direction: 
 }
 
 export function Skills() {
+  const firestore = useFirestore();
   const [skillsByRow, setSkillsByRow] = React.useState<{ r1: Skill[], r2: Skill[], r3: Skill[] }>({ r1: [], r2: [], r3: [] });
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     async function fetchSkills() {
+      if (!firestore) return;
       try {
-        const q = query(collection(db, 'skills'), where('visible', '==', true), orderBy('order', 'asc'));
-        const querySnapshot = await getDocs(q);
+        const querySnapshot = await getDocs(collection(firestore, 'skills'));
         const fetchedSkills = querySnapshot.docs.map(doc => doc.data() as Skill);
         
-        const allSkills = fetchedSkills.length > 0 ? fetchedSkills : DEFAULT_SKILLS;
+        // Handle filtering and sorting on the client side to avoid missing index errors
+        const allSkills = fetchedSkills.length > 0 
+          ? fetchedSkills
+              .filter(s => s.visible !== false)
+              .sort((a, b) => (a.order || 0) - (b.order || 0))
+          : DEFAULT_SKILLS;
         
-        // Split into 3 rows logically
         const r1 = allSkills.filter((_, i) => i % 3 === 0);
         const r2 = allSkills.filter((_, i) => i % 3 === 1);
         const r3 = allSkills.filter((_, i) => i % 3 === 2);
@@ -95,7 +100,7 @@ export function Skills() {
       }
     }
     fetchSkills();
-  }, []);
+  }, [firestore]);
 
   return (
     <section id="skills" className="py-24 bg-background overflow-hidden">
