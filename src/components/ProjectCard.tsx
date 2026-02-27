@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -10,11 +11,13 @@ import { cn } from "@/lib/utils"
 export type Project = {
   id: number
   name: string
-  description: string
+  description: string | null
   topics: string[]
   homepage: string
   html_url: string
   language: string
+  readmeMarkdown?: string
+  aiSummary?: string
 }
 
 interface ProjectCardProps {
@@ -33,20 +36,20 @@ export function ProjectCard({ project, onOpenDetails }: ProjectCardProps) {
       className="group relative h-full"
     >
       {/* Glow Effect on Hover */}
-      <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-accent rounded-2xl blur opacity-0 group-hover:opacity-30 transition duration-500" />
+      <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-accent rounded-2xl blur opacity-0 group-hover:opacity-40 transition duration-500" />
       
-      <div className="relative h-full flex flex-col bg-card border border-border rounded-2xl overflow-hidden shadow-xl transition-all duration-500">
+      <div className="relative h-full flex flex-col bg-card border-2 border-border/80 rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 group-hover:border-primary/50">
         
         {/* Card Header with Icon and Actions */}
         <div className="p-6 pb-0 flex justify-between items-start">
-          <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center text-primary border border-primary/30 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-sm">
+          <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center text-primary border border-primary/30 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-md">
             <Code2 className="w-6 h-6" />
           </div>
-          <div className="flex gap-1.5">
+          <div className="flex gap-2">
             <Button 
-              variant="ghost" 
+              variant="secondary" 
               size="icon" 
-              className="h-8 w-8 rounded-full hover:bg-primary/20 hover:text-primary transition-colors" 
+              className="h-9 w-9 rounded-full hover:bg-primary/20 hover:text-primary transition-all shadow-sm" 
               asChild
             >
               <a href={project.html_url} target="_blank" rel="noopener noreferrer" title="View Source">
@@ -55,9 +58,9 @@ export function ProjectCard({ project, onOpenDetails }: ProjectCardProps) {
             </Button>
             {project.homepage && (
               <Button 
-                variant="ghost" 
+                variant="secondary" 
                 size="icon" 
-                className="h-8 w-8 rounded-full hover:bg-accent/20 hover:text-accent transition-colors" 
+                className="h-9 w-9 rounded-full hover:bg-accent/20 hover:text-accent transition-all shadow-sm" 
                 asChild
               >
                 <a href={project.homepage} target="_blank" rel="noopener noreferrer" title="Live Demo">
@@ -70,10 +73,10 @@ export function ProjectCard({ project, onOpenDetails }: ProjectCardProps) {
 
         {/* Content Body */}
         <div className="p-6 flex-grow flex flex-col">
-          <h3 className="text-xl font-bold mb-3 tracking-tight group-hover:text-primary transition-colors">
+          <h3 className="text-xl font-black mb-3 tracking-tight group-hover:text-primary transition-colors drop-shadow-sm">
             {project.name.replace(/-/g, ' ')}
           </h3>
-          <p className="text-sm text-muted-foreground line-clamp-3 mb-6 leading-relaxed">
+          <p className="text-sm font-medium text-muted-foreground line-clamp-3 mb-6 leading-relaxed">
             {project.description || "An innovative digital solution architected with precision and modern design principles."}
           </p>
 
@@ -83,16 +86,16 @@ export function ProjectCard({ project, onOpenDetails }: ProjectCardProps) {
                 project.topics.slice(0, 3).map((topic) => (
                   <Badge 
                     key={topic} 
-                    variant="secondary" 
-                    className="bg-primary/15 text-primary border-primary/20 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5"
+                    variant="default" 
+                    className="bg-primary/20 text-primary border-primary/30 text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 shadow-sm"
                   >
                     {topic}
                   </Badge>
                 ))
               ) : (
                 <Badge 
-                  variant="secondary" 
-                  className="bg-accent/15 text-accent border-accent/20 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5"
+                  variant="default" 
+                  className="bg-accent/20 text-accent-foreground border-accent/30 text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 shadow-sm"
                 >
                   {project.language || "Web Project"}
                 </Badge>
@@ -101,7 +104,7 @@ export function ProjectCard({ project, onOpenDetails }: ProjectCardProps) {
 
             <Button 
               onClick={() => onOpenDetails(project)}
-              className="w-full rounded-xl bg-secondary text-secondary-foreground hover:bg-primary hover:text-white border border-border hover:border-transparent transition-all duration-300 font-bold flex items-center justify-center gap-2 group/btn"
+              className="w-full h-11 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all duration-300 font-bold flex items-center justify-center gap-2 group/btn"
             >
               <Info className="w-4 h-4 transition-transform group-hover/btn:rotate-12" />
               Project Insights
