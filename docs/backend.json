@@ -1,56 +1,247 @@
-
 {
   "entities": {
-    "ResumeConfig": {
-      "title": "Resume Configuration",
-      "description": "Global configuration for the professional resume link.",
-      "type": "object",
-      "properties": {
-        "resumeUrl": { "type": "string", "format": "uri", "description": "The URL to the hosted PDF resume." },
-        "lastUpdated": { "type": "string", "format": "date-time", "description": "Last time the resume was updated." }
-      },
-      "required": ["resumeUrl"]
-    },
     "Skill": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Skill",
-      "description": "A technical skill to display in the marquee rows.",
       "type": "object",
+      "description": "Represents a technical or soft skill possessed by the portfolio owner, including details for display in the 'About' section.",
       "properties": {
-        "name": { "type": "string" },
-        "category": { "type": "string", "enum": ["Frontend", "Backend", "AI", "Tools"] },
-        "icon": { "type": "string", "description": "SVG path or identifier for the skill icon." },
-        "order": { "type": "number" },
-        "visible": { "type": "boolean" }
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Skill entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The descriptive name of the skill (e.g., 'React', 'Python', 'UX Design')."
+        },
+        "category": {
+          "type": "string",
+          "description": "The category this skill belongs to, helping organize skills (e.g., 'Frontend', 'Backend', 'Database', 'Tools', 'Soft Skills')."
+        },
+        "iconName": {
+          "type": "string",
+          "description": "A identifier or path referencing the icon associated with this skill, used for visual representation (e.g., 'fa-react', 'python.svg')."
+        },
+        "proficiencyLevel": {
+          "type": "number",
+          "description": "A numerical value indicating the level of proficiency with this skill (e.g., 1-5, 0-100). This can be used for visual indicators like progress bars or star ratings."
+        },
+        "isDisplayed": {
+          "type": "boolean",
+          "description": "A flag indicating whether this skill should be publicly displayed on the portfolio's 'About' section."
+        },
+        "order": {
+          "type": "number",
+          "description": "An integer value used to determine the display order of the skill within its category or the overall skills list on the portfolio."
+        }
       },
-      "required": ["name", "category", "visible"]
+      "required": [
+        "id",
+        "name",
+        "category",
+        "iconName",
+        "proficiencyLevel",
+        "isDisplayed",
+        "order"
+      ]
     },
-    "ProjectOverride": {
-      "title": "Project Override",
-      "description": "Custom metadata for GitHub repositories.",
+    "Project": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Project",
       "type": "object",
+      "description": "Represents a developer project, primarily fetched from GitHub and augmented with AI-generated content or manual overrides for portfolio display.",
       "properties": {
-        "featured": { "type": "boolean" },
-        "visible": { "type": "boolean" },
-        "customOrder": { "type": "number" },
-        "customDescription": { "type": "string" }
-      }
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Project entity."
+        },
+        "githubFullName": {
+          "type": "string",
+          "description": "The full name of the GitHub repository (e.g., 'username/repo-name'), used to uniquely identify and link to the source repository. (Relationship: GitHub Repository 1:1 Project)"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the project, typically derived from the GitHub repository name."
+        },
+        "shortDescription": {
+          "type": "string",
+          "description": "A brief summary of the project, usually from the GitHub repository description."
+        },
+        "techStack": {
+          "type": "array",
+          "description": "An array of technologies or programming languages used in the project.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "liveUrl": {
+          "type": "string",
+          "description": "The URL to the live deployment or demo of the project. This field is required for a project to be displayed.",
+          "format": "uri"
+        },
+        "githubUrl": {
+          "type": "string",
+          "description": "The URL to the GitHub repository for the project.",
+          "format": "uri"
+        },
+        "aiSummary": {
+          "type": "string",
+          "description": "An AI-generated concise summary of the project's README.md content, used for quick comprehension."
+        },
+        "readmeMarkdown": {
+          "type": "string",
+          "description": "The full Markdown content of the project's README.md file, used for detailed display in a modal."
+        },
+        "lastSyncedAt": {
+          "type": "string",
+          "description": "The timestamp indicating when the project data (including GitHub details and AI summary) was last synchronized or updated.",
+          "format": "date-time"
+        },
+        "isFeatured": {
+          "type": "boolean",
+          "description": "A flag indicating if this project should be highlighted as a featured project on the portfolio."
+        },
+        "displayOrder": {
+          "type": "number",
+          "description": "An integer value to manually control the display order of projects, especially featured ones."
+        }
+      },
+      "required": [
+        "id",
+        "githubFullName",
+        "name",
+        "shortDescription",
+        "techStack",
+        "liveUrl",
+        "githubUrl",
+        "aiSummary",
+        "readmeMarkdown",
+        "lastSyncedAt",
+        "isFeatured",
+        "displayOrder"
+      ]
+    },
+    "ContactMessage": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ContactMessage",
+      "type": "object",
+      "description": "Stores messages submitted through the portfolio's contact form, enabling the portfolio owner to review inquiries.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ContactMessage entity."
+        },
+        "senderName": {
+          "type": "string",
+          "description": "The name of the person who sent the message."
+        },
+        "senderEmail": {
+          "type": "string",
+          "description": "The email address of the sender, used for replies.",
+          "format": "email"
+        },
+        "subject": {
+          "type": "string",
+          "description": "The subject line of the contact message."
+        },
+        "messageContent": {
+          "type": "string",
+          "description": "The full content of the message sent by the user."
+        },
+        "sentAt": {
+          "type": "string",
+          "description": "The timestamp when the message was submitted.",
+          "format": "date-time"
+        },
+        "isRead": {
+          "type": "boolean",
+          "description": "A flag indicating whether the portfolio owner has marked this message as read."
+        }
+      },
+      "required": [
+        "id",
+        "senderName",
+        "senderEmail",
+        "subject",
+        "messageContent",
+        "sentAt",
+        "isRead"
+      ]
     }
   },
   "auth": {
-    "providers": ["google.com"]
+    "providers": [
+      "password",
+      "anonymous"
+    ]
   },
   "firestore": {
-    "/portfolioConfig/resume": {
-      "schema": { "$ref": "#/backend/entities/ResumeConfig" },
-      "description": "Storage for the main resume URL."
-    },
-    "/skills/{skillId}": {
-      "schema": { "$ref": "#/backend/entities/Skill" },
-      "description": "Collection of technical skills."
-    },
-    "/projectOverrides/{repoName}": {
-      "schema": { "$ref": "#/backend/entities/ProjectOverride" },
-      "description": "Overrides for GitHub projects keyed by repo name."
-    }
+    "structure": [
+      {
+        "path": "/app_roles/portfolioOwners/{ownerUid}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "System collection for Database Access Control (DBAC); the existence of a document at `{ownerUid}` grants global portfolio owner privileges. This is an implied entity to support role-based access.",
+          "params": [
+            {
+              "name": "ownerUid",
+              "description": "The unique user ID of the portfolio owner."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/skills/{skillId}",
+        "definition": {
+          "entityName": "Skill",
+          "schema": {
+            "$ref": "#/backend/entities/Skill"
+          },
+          "description": "Collection storing the portfolio owner's skills. Write access is restricted to the portfolio owner, while read access for public users is granted only for documents where 'isDisplayed' is true.",
+          "params": [
+            {
+              "name": "skillId",
+              "description": "The unique identifier for a specific skill."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/projects/{projectId}",
+        "definition": {
+          "entityName": "Project",
+          "schema": {
+            "$ref": "#/backend/entities/Project"
+          },
+          "description": "Collection storing the portfolio owner's projects. Write access is restricted to the portfolio owner, while read access for public users is granted only for documents with a valid 'liveUrl'.",
+          "params": [
+            {
+              "name": "projectId",
+              "description": "The unique identifier for a specific project."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/contactMessages/{messageId}",
+        "definition": {
+          "entityName": "ContactMessage",
+          "schema": {
+            "$ref": "#/backend/entities/ContactMessage"
+          },
+          "description": "Collection for contact form submissions. Public users can create messages. Only the portfolio owner can read, update, or delete these messages.",
+          "params": [
+            {
+              "name": "messageId",
+              "description": "The unique identifier for a specific contact message."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The proposed Firestore structure for DevSphere Portfolio prioritizes secure, scalable, and debuggable authorization by adhering to the core design principles, especially Authorization Independence and Structural Segregation.\n\n1.  **Authorization Independence (CRITICAL):**\n    *   **Global Owner Role (DBAC):** A dedicated collection `/app_roles/portfolioOwners/{ownerUid}` is established to define the single portfolio owner. Security rules can quickly verify the owner's identity using an `exists()` check (e.g., `exists(/databases/$(database)/documents/app_roles/portfolioOwners/$(request.auth.uid))`). This method is atomically safe and avoids `get()` calls on potentially nested or hierarchical parent documents for authorization, ensuring operations like atomic creation of related documents can proceed without complex rule dependencies.\n    *   **Self-Contained Authorization for Public Data:** For publicly displayed `skills` and `projects`, authorization logic relies solely on fields *within the document itself* (e.g., `isDisplayed: true` for skills, `liveUrl: '...'` for projects). This means no `get()` calls are required to determine public readability, which is key for atomic reads and simplified rule logic.\n    *   **Contact Messages:** Public users can `create` `contactMessages` without any authentication or authorization dependencies. The portfolio owner's ability to read/manage these messages is based on their global `portfolioOwner` role, again, independent of hierarchical data.\n\n2.  **Structural Segregation (Homogeneous Security Posture):**\n    *   Each collection (`skills`, `projects`, `contactMessages`, `app_roles`) maintains a homogeneous security posture. For example, all documents in `/skills` are managed by the portfolio owner, and a subset (based on the `isDisplayed` field) is publicly readable. This avoids mixing data with disparate access requirements within the same collection, which significantly simplifies security rules by moving complexity from logic to structure.\n\n3.  **QAPs (Rules are not Filters):**\n    *   **Portfolio Owner:** The owner can perform `list` operations on `/skills`, `/projects`, and `/contactMessages` to retrieve all their data, as they have comprehensive permissions based on their global role. This satisfies QAPs for administrative views.\n    *   **Public Users:** Public `list` operations for `/skills` and `/projects` are secured by intrinsic document fields. For example, a public user querying `/skills` will implicitly include `where('isDisplayed', '==', true)` in their query. The security rules will then *validate* this query to ensure `isDisplayed == true` for all returned documents. This setup allows for efficient and secure public display of data, ensuring unauthorized data is never retrieved or revealed and that rules do not act as hidden filters.\n    *   Public users cannot `list` documents from `/contactMessages`, as per the design where only the owner can read these. This is strictly enforced by security rules.\n\nThis structure significantly reduces the complexity of Firestore security rules, improves their debuggability, and enhances application performance by avoiding costly document `get()` calls in authorization checks, while ensuring secure access patterns for both the portfolio owner and public users. While the `User` entity is not explicitly defined in the provided `backend.entities`, it is referenced for `app_roles` as a common architectural pattern to store user-based roles, aligned with the example provided in the prompt's `$ref` pattern."
   }
 }
