@@ -2,8 +2,9 @@
 'use client';
 
 import * as React from 'react';
-import { db } from '@/lib/firebase';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { useFirestore, useUser } from '@/firebase';
+import { doc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
@@ -12,6 +13,8 @@ import { Loader2, Save, ExternalLink } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export function ResumeManager() {
+  const firestore = useFirestore();
+  const { user, isUserLoading } = useUser();
   const [resumeUrl, setResumeUrl] = React.useState('');
   const [loading, setLoading] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
@@ -19,8 +22,9 @@ export function ResumeManager() {
 
   React.useEffect(() => {
     async function fetchResume() {
+      if (!firestore) return;
       try {
-        const docRef = doc(db, 'portfolioConfig', 'resume');
+        const docRef = doc(firestore, 'portfolioConfig', 'resume');
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           setResumeUrl(docSnap.data().resumeUrl || '');
@@ -32,26 +36,34 @@ export function ResumeManager() {
       }
     }
     fetchResume();
-  }, []);
+  }, [firestore]);
 
   const handleSave = async () => {
-    if (!resumeUrl) return;
-    setSaving(true);
-    try {
-      await setDoc(doc(db, 'portfolioConfig', 'resume'), {
-        resumeUrl,
-        lastUpdated: serverTimestamp(),
-      });
-      toast({ title: 'Success', description: 'Resume URL updated successfully.' });
-    } catch (err) {
-      console.error('Error saving resume:', err);
-      toast({ variant: 'destructive', title: 'Error', description: 'Failed to update resume URL.' });
-    } finally {
-      setSaving(false);
+    if (!resumeUrl || !firestore || !user) {
+      if (!user) {
+        toast({ variant: 'destructive', title: 'Authentication Error', description: 'You must be signed in to update the resume.' });
+      }
+      return;
     }
+    
+    setSaving(true);
+    const docRef = doc(firestore, 'portfolioConfig', 'resume');
+    const data = {
+      resumeUrl,
+      lastUpdated: serverTimestamp(),
+    };
+
+    setDocumentNonBlocking(docRef, data, { merge: true });
+    
+    // We assume success for the UI since we use optimistic non-blocking pattern
+    // The global error listener will catch any permission issues
+    setTimeout(() => {
+      setSaving(false);
+      toast({ title: 'Update Initiated', description: 'The resume URL update has been queued.' });
+    }, 500);
   };
 
-  if (loading) return <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
+  if (loading || isUserLoading) return <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
 
   return (
     <Card className="shadow-lg border-primary/10">
@@ -65,7 +77,7 @@ export function ResumeManager() {
           <div className="flex gap-2">
             <Input 
               id="resume-url" 
-              placeholder="https://example.com/resume.pdf" 
+              placeholder="https://drive.google.com/..." 
               value={resumeUrl} 
               onChange={(e) => setResumeUrl(e.target.value)} 
             />
@@ -77,7 +89,9 @@ export function ResumeManager() {
               </Button>
             )}
           </div>
-          <p className="text-xs text-muted-foreground">Ensure this is a public link to your professional resume (e.g., from Firebase Storage or Google Drive).</p>
+          <p className="text-xs text-muted-foreground">
+            Supports Google Drive sharing links, direct PDF links, or Firebase Storage URLs.
+          </p>
         </div>
       </CardContent>
       <CardFooter>

@@ -6,7 +6,7 @@ import { X, Download, ZoomIn, ZoomOut, QrCode, FileText, CheckCircle2 } from "lu
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { QRCodeSVG, QRCodeCanvas } from "qrcode.react"
-import { db } from '@/lib/firebase';
+import { useFirestore } from '@/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
 interface ResumeModalProps {
@@ -15,11 +15,25 @@ interface ResumeModalProps {
 }
 
 export function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
+  const firestore = useFirestore();
   const [zoom, setZoom] = React.useState(100)
   const [showQR, setShowQR] = React.useState(false)
-  const [resumeUrl, setResumeUrl] = React.useState("/resume.pdf") // Fallback
+  const [resumeUrl, setResumeUrl] = React.useState("/resume.pdf") 
   const [origin, setOrigin] = React.useState('https://tarun.dev')
-  const qrRef = React.useRef<HTMLDivElement>(null)
+
+  // Transform Google Drive links to preview links so they can be embedded in iframe
+  const getEmbedUrl = (url: string) => {
+    if (url.includes('drive.google.com')) {
+      // Matches: /file/d/[ID]/view or /file/d/[ID]/edit
+      const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (match && match[1]) {
+        return `https://drive.google.com/file/d/${match[1]}/preview`;
+      }
+    }
+    return url;
+  };
+
+  const displayUrl = React.useMemo(() => getEmbedUrl(resumeUrl), [resumeUrl]);
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -29,8 +43,9 @@ export function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
 
   React.useEffect(() => {
     async function fetchResumeUrl() {
+      if (!firestore) return;
       try {
-        const docRef = doc(db, 'portfolioConfig', 'resume');
+        const docRef = doc(firestore, 'portfolioConfig', 'resume');
         const docSnap = await getDoc(docRef);
         if (docSnap.exists() && docSnap.data().resumeUrl) {
           setResumeUrl(docSnap.data().resumeUrl);
@@ -42,13 +57,13 @@ export function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
     if (isOpen) {
       fetchResumeUrl();
     }
-  }, [isOpen]);
+  }, [isOpen, firestore]);
 
   const handleDownload = () => {
     const link = document.createElement("a")
     link.href = resumeUrl
     link.target = "_blank"
-    link.download = "Tarun_Kumar_Fullstack_AI_Resume.pdf"
+    link.download = "Tarun_Kumar_Resume.pdf"
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -76,7 +91,9 @@ export function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
               <FileText className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-sm font-bold tracking-tight">Tarun_Kumar_Resume.pdf</h2>
+              <h2 className="text-sm font-bold tracking-tight truncate max-w-[120px] md:max-w-none">
+                {resumeUrl.split('/').pop()?.split('?')[0] || 'Resume.pdf'}
+              </h2>
               <p className="text-[10px] text-muted-foreground uppercase font-semibold">Fullstack & AI Engineer</p>
             </div>
           </div>
@@ -115,9 +132,9 @@ export function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
           >
             <div className="w-full aspect-[1/1.414] bg-white rounded-lg shadow-2xl overflow-hidden border border-border/50">
               <iframe 
-                src={`${resumeUrl}#toolbar=0`} 
+                src={displayUrl} 
                 className="w-full h-full border-none"
-                title="Resume PDF"
+                title="Resume Viewer"
               />
             </div>
           </div>

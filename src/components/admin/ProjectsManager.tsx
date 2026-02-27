@@ -2,16 +2,16 @@
 'use client';
 
 import * as React from 'react';
-import { db } from '@/lib/firebase';
-import { doc, getDocs, collection, setDoc, query } from 'firebase/firestore';
+import { useFirestore, useUser } from '@/firebase';
+import { doc, getDocs, collection } from 'firebase/firestore';
+import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Loader2, Star, EyeOff, Save, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Loader2, Save, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface Repo {
@@ -30,6 +30,8 @@ interface Override {
 }
 
 export function ProjectsManager() {
+  const firestore = useFirestore();
+  const { user } = useUser();
   const [repos, setRepos] = React.useState<Repo[]>([]);
   const [overrides, setOverrides] = React.useState<Record<string, Override>>({});
   const [loading, setLoading] = React.useState(true);
@@ -39,7 +41,8 @@ export function ProjectsManager() {
   
   const reposPerPage = 6;
 
-  const fetchData = async () => {
+  const fetchData = React.useCallback(async () => {
+    if (!firestore) return;
     setLoading(true);
     try {
       // Fetch GitHub repos
@@ -47,10 +50,10 @@ export function ProjectsManager() {
       const repoData = await repoRes.json();
       
       // Fetch Overrides from Firestore
-      const overrideSnapshot = await getDocs(collection(db, 'projectOverrides'));
+      const overrideSnapshot = await getDocs(collection(firestore, 'projectOverrides'));
       const overrideData: Record<string, Override> = {};
       overrideSnapshot.forEach(doc => {
-        overrideData[doc.id] = { id: doc.id, ...doc.data() };
+        overrideData[doc.id] = { id: doc.id, ...doc.data() } as Override;
       });
 
       setRepos(repoData);
@@ -60,11 +63,11 @@ export function ProjectsManager() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [firestore]);
 
   React.useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const handleUpdateOverride = (repoName: string, field: keyof Override, value: any) => {
     setOverrides(prev => ({
@@ -77,17 +80,19 @@ export function ProjectsManager() {
   };
 
   const handleSaveOverride = async (repoName: string) => {
+    if (!firestore || !user) return;
     setSavingId(repoName);
-    try {
-      const data = overrides[repoName] || { visible: true, featured: false };
-      const { id, ...saveData } = data;
-      await setDoc(doc(db, 'projectOverrides', repoName), saveData);
-      toast({ title: 'Success', description: `Overrides for ${repoName} saved.` });
-    } catch (err) {
-      toast({ variant: 'destructive', title: 'Error', description: 'Failed to save overrides.' });
-    } finally {
+    
+    const data = overrides[repoName] || { visible: true, featured: false };
+    const { id, ...saveData } = data;
+    const docRef = doc(firestore, 'projectOverrides', repoName);
+    
+    setDocumentNonBlocking(docRef, saveData, { merge: true });
+    
+    setTimeout(() => {
       setSavingId(null);
-    }
+      toast({ title: 'Success', description: `Overrides for ${repoName} updated.` });
+    }, 500);
   };
 
   const indexOfLastRepo = currentPage * reposPerPage;
