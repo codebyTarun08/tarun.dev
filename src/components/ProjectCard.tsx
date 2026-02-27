@@ -38,7 +38,7 @@ export function ProjectCard({ project, onOpenDetails }: ProjectCardProps) {
       {/* Glow Effect on Hover */}
       <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-accent rounded-2xl blur opacity-0 group-hover:opacity-40 transition duration-500" />
       
-      <div className="relative h-full flex flex-col bg-card border-2 border-border/80 rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 group-hover:border-primary/50">
+      <div className="relative h-full flex flex-col bg-card border-2 border-border rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 group-hover:border-primary/50">
         
         {/* Card Header with Icon and Actions */}
         <div className="p-6 pb-0 flex justify-between items-start">
@@ -87,7 +87,7 @@ export function ProjectCard({ project, onOpenDetails }: ProjectCardProps) {
                   <Badge 
                     key={topic} 
                     variant="default" 
-                    className="bg-primary/20 text-primary border-primary/30 text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 shadow-sm"
+                    className="bg-primary/30 text-primary border-primary/40 text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 shadow-sm transition-colors hover:bg-primary/10 hover:text-primary"
                   >
                     {topic}
                   </Badge>
@@ -95,7 +95,7 @@ export function ProjectCard({ project, onOpenDetails }: ProjectCardProps) {
               ) : (
                 <Badge 
                   variant="default" 
-                  className="bg-accent/20 text-accent-foreground border-accent/30 text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 shadow-sm"
+                  className="bg-accent/30 text-accent-foreground border-accent/40 text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 shadow-sm transition-colors hover:bg-accent/10 hover:text-accent-foreground"
                 >
                   {project.language || "Web Project"}
                 </Badge>
