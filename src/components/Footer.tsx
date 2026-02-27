@@ -23,16 +23,34 @@ export function Footer() {
           </div>
 
           <div className="flex gap-4">
-            <a href="https://github.com/codebyTarun08" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-primary/10 transition-colors">
+            <a 
+              href="https://github.com/codebyTarun08" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="p-2 rounded-full hover:bg-primary/10 transition-colors"
+            >
               <Github className="w-5 h-5" />
             </a>
-            <a href="#" className="p-2 rounded-full hover:bg-primary/10 transition-colors">
+            <a 
+              href="https://x.com/Tarun5777949762?t=aZtjB6VmvcjAeFm5gBrAUw" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="p-2 rounded-full hover:bg-primary/10 transition-colors"
+            >
               <Twitter className="w-5 h-5" />
             </a>
-            <a href="#" className="p-2 rounded-full hover:bg-primary/10 transition-colors">
+            <a 
+              href="https://www.linkedin.com/in/tarun-kumar-98a0b0267/" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="p-2 rounded-full hover:bg-primary/10 transition-colors"
+            >
               <Linkedin className="w-5 h-5" />
             </a>
-            <a href="#" className="p-2 rounded-full hover:bg-primary/10 transition-colors">
+            <a 
+              href="#" 
+              className="p-2 rounded-full hover:bg-primary/10 transition-colors"
+            >
               <Instagram className="w-5 h-5" />
             </a>
           </div>
