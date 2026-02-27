@@ -10,6 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import rehypeRaw from 'rehype-raw'
 import { Project } from "./ProjectCard"
 import { summarizeProjectReadme } from "@/ai/flows/ai-project-readme-summary-flow"
 
@@ -152,13 +153,19 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                     <p className="text-sm font-bold uppercase tracking-widest animate-pulse">Fetching Documentation...</p>
                   </div>
                 ) : readme ? (
-                  <div className="prose prose-sm dark:prose-invert max-w-none 
-                    prose-headings:font-black prose-headings:tracking-tighter prose-headings:text-foreground
+                  <div className="prose prose-neutral dark:prose-invert max-w-none 
+                    prose-headings:font-black prose-headings:tracking-tight prose-headings:text-foreground
                     prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:text-base
-                    prose-strong:text-foreground prose-code:bg-secondary prose-code:p-1 prose-code:rounded
-                    prose-pre:bg-secondary prose-pre:rounded-xl prose-pre:p-4 prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+                    prose-strong:text-foreground prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none
+                    prose-pre:bg-muted prose-pre:rounded-xl prose-pre:p-4 prose-pre:border prose-pre:border-border
+                    prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+                    prose-img:rounded-xl prose-img:shadow-md
+                    prose-hr:border-border
                   ">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    <ReactMarkdown 
+                      remarkPlugins={[remarkGfm]} 
+                      rehypePlugins={[rehypeRaw]}
+                    >
                       {readme}
                     </ReactMarkdown>
                   </div>
