@@ -23,17 +23,61 @@ export function Hero() {
   const [mounted, setMounted] = React.useState(false)
 
   React.useEffect(() => {
-    setMounted(true)
+    const timer = setTimeout(() => setMounted(true), 100)
+    return () => clearTimeout(timer)
   }, [])
 
-  if (!mounted) return null
+  if (!mounted) return (
+    <section id="home" className="relative min-h-screen w-full flex items-center justify-center bg-background" />
+  )
 
   return (
-    <section id="home" className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_50%_50%,_rgba(109,40,217,0.15),_rgba(255,255,255,0))] dark:bg-[radial-gradient(circle_at_50%_50%,_rgba(109,40,217,0.2),_rgba(10,10,10,1))]">
-      {/* Background Decoration */}
-      <div className="absolute top-0 left-0 w-full h-full -z-10 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[120px] pointer-events-none" />
+    <section id="home" className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-background">
+      {/* Animated Background */}
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        {/* Glowing Animated Blobs */}
+        <motion.div
+          animate={{
+            x: [0, 80, 0],
+            y: [0, 40, 0],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-primary/10 rounded-full blur-[120px] pointer-events-none"
+        />
+        <motion.div
+          animate={{
+            x: [0, -60, 0],
+            y: [0, 80, 0],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-accent/10 rounded-full blur-[120px] pointer-events-none"
+        />
+        <motion.div
+          animate={{
+            x: [0, 40, 0],
+            y: [0, -40, 0],
+            scale: [1, 1.15, 1],
+          }}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute top-[20%] right-[10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[100px] pointer-events-none"
+        />
+        
+        {/* Technical Grid Pattern Overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-40" />
       </div>
 
       <div className="container mx-auto px-6 z-10 pt-32 pb-32 flex flex-col items-center text-center">
@@ -80,9 +124,9 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter mb-8 leading-[1.1] md:leading-[1.1]"
+            className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter mb-8 leading-[1.1] md:leading-[1.1] max-w-5xl mx-auto"
           >
-            I&apos;m Tarun, a <br />
+            I&apos;m Tarun, a <br className="hidden md:block" />
             <span className="text-primary italic relative inline-block">
               Creative
               <motion.svg
@@ -116,6 +160,7 @@ export function Hero() {
               size="lg" 
               className="rounded-full px-10 h-14 bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:scale-105 transition-all group" 
               asChild
+              suppressHydrationWarning
             >
               <a href="#projects">
                 View My Work
