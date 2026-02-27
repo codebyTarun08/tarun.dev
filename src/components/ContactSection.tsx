@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -71,43 +70,43 @@ export function ContactSection() {
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           <div className="reveal">
-            <h2 className="text-sm font-bold text-primary uppercase tracking-[0.3em] mb-4">Contact</h2>
-            <h3 className="text-4xl font-bold mb-6">Let&apos;s Build Something Incredible Together.</h3>
+            <h2 className="text-sm font-bold text-primary uppercase tracking-[0.3em] mb-4 drop-shadow-sm">Contact</h2>
+            <h3 className="text-4xl font-bold mb-6 drop-shadow-sm">Let&apos;s Build Something Incredible Together.</h3>
             <p className="text-lg text-muted-foreground mb-10">
               Whether you have a specific project in mind or just want to say hello, feel free to reach out. I am always open to discussing new ideas.
             </p>
 
             <div className="space-y-6">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shadow-inner">
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-sm">Location</h4>
+                  <h4 className="font-semibold text-sm drop-shadow-sm">Location</h4>
                   <p className="text-muted-foreground">Noida, India</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shadow-inner">
                   <Mail className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-sm">Email</h4>
+                  <h4 className="font-semibold text-sm drop-shadow-sm">Email</h4>
                   <p className="text-muted-foreground">tarunarcade56@gmail.com</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-card p-8 rounded-3xl border border-border shadow-xl relative reveal">
+          <div className="bg-card p-8 rounded-3xl border border-border shadow-[0_20px_60px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.3)] relative reveal">
             {isSuccess ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-card rounded-3xl z-10 animate-in fade-in zoom-in duration-500 text-center px-6">
-                <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mb-6">
+                <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mb-6 shadow-sm">
                   <CheckCircle2 className="w-10 h-10 text-green-500" />
                 </div>
-                <h4 className="text-2xl font-bold mb-2">Message Sent!</h4>
+                <h4 className="text-2xl font-bold mb-2 drop-shadow-sm">Message Sent!</h4>
                 <p className="text-muted-foreground">Thank you for reaching out. I&apos;ll get back to you shortly.</p>
-                <Button variant="outline" className="mt-8 rounded-full" onClick={() => setIsSuccess(false)}>
+                <Button variant="outline" className="mt-8 rounded-full shadow-sm" onClick={() => setIsSuccess(false)}>
                   Send another message
                 </Button>
               </div>
@@ -120,9 +119,9 @@ export function ContactSection() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name</FormLabel>
+                      <FormLabel className="drop-shadow-sm">Full Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Tarun Kumar" {...field} className="rounded-xl bg-secondary/20 border-transparent focus:border-primary transition-all" />
+                        <Input placeholder="Tarun Kumar" {...field} className="rounded-xl bg-secondary/20 border-transparent focus:border-primary transition-all shadow-inner" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -133,9 +132,9 @@ export function ContactSection() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email Address</FormLabel>
+                      <FormLabel className="drop-shadow-sm">Email Address</FormLabel>
                       <FormControl>
-                        <Input placeholder="tk@gmail.com" {...field} className="rounded-xl bg-secondary/20 border-transparent focus:border-primary transition-all" />
+                        <Input placeholder="tk@gmail.com" {...field} className="rounded-xl bg-secondary/20 border-transparent focus:border-primary transition-all shadow-inner" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -146,11 +145,11 @@ export function ContactSection() {
                   name="message"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Message</FormLabel>
+                      <FormLabel className="drop-shadow-sm">Message</FormLabel>
                       <FormControl>
                         <Textarea 
                           placeholder="Tell me about your project..." 
-                          className="min-h-[150px] rounded-xl bg-secondary/20 border-transparent focus:border-primary transition-all resize-none" 
+                          className="min-h-[150px] rounded-xl bg-secondary/20 border-transparent focus:border-primary transition-all resize-none shadow-inner" 
                           {...field} 
                         />
                       </FormControl>
@@ -160,7 +159,7 @@ export function ContactSection() {
                 />
                 <Button 
                   type="submit" 
-                  className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 font-bold transition-all"
+                  className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 font-bold transition-all shadow-[0_10px_20px_rgba(109,40,217,0.2)] hover:shadow-[0_15px_30px_rgba(109,40,217,0.3)]"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
