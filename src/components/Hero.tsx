@@ -20,6 +20,13 @@ export function Hero() {
   const profileImageUrl = "https://drive.google.com/uc?id=1F0Fq0HAP00o3e8--9bxEMI-qxzDijqkp"
   const githubFallbackUrl = "https://github.com/codebyTarun08.png"
   const [imgSrc, setImgSrc] = React.useState(profileImageUrl)
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) return null
 
   return (
     <section id="home" className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_50%_50%,_rgba(109,40,217,0.15),_rgba(255,255,255,0))] dark:bg-[radial-gradient(circle_at_50%_50%,_rgba(109,40,217,0.2),_rgba(10,10,10,1))]">
@@ -37,7 +44,7 @@ export function Hero() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="relative mb-8"
         >
-          <div className="w-32 h-32 md:w-44 md:h-44 rounded-full overflow-hidden border-4 border-white dark:border-white/10 shadow-2xl relative">
+          <div className="w-32 h-32 md:w-44 md:h-44 rounded-full overflow-hidden border-4 border-white dark:border-white/10 shadow-2xl relative bg-card">
             <Image
               src={imgSrc}
               alt="Tarun Profile"
@@ -57,7 +64,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="max-w-5xl"
+          className="max-w-4xl"
         >
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -73,7 +80,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="text-5xl md:text-8xl lg:text-9xl font-black tracking-tighter mb-8 leading-[0.85] md:leading-[0.9]"
+            className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter mb-8 leading-[1.1] md:leading-[1.1]"
           >
             I&apos;m Tarun, a <br />
             <span className="text-primary italic relative inline-block">
@@ -87,8 +94,7 @@ export function Hero() {
               >
                 <path d="M0 10 Q 50 20 100 10 T 200 10" fill="none" stroke="currentColor" strokeWidth="4" />
               </motion.svg>
-            </span> <br />
-            Developer.
+            </span> Developer.
           </motion.h1>
           
           <motion.div 
