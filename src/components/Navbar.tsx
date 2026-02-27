@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -74,13 +73,13 @@ export function Navbar() {
             </Link>
           ))}
           <div className="h-6 w-px bg-border/50 mx-2" />
-          <ResumeButton variant="ghost" className="h-9 px-4 text-[10px] font-bold uppercase tracking-widest" />
+          <ResumeButton side="bottom" variant="ghost" className="h-9 px-4 text-[10px] font-bold uppercase tracking-widest" />
           <ThemeToggle />
         </div>
 
         <div className="md:hidden flex items-center gap-4">
           <ThemeToggle />
-          <ResumeButton variant="outline" className="h-9 px-4 text-[10px] font-bold uppercase tracking-widest" />
+          <ResumeButton side="bottom" variant="outline" className="h-9 px-4 text-[10px] font-bold uppercase tracking-widest" />
         </div>
       </div>
     </motion.nav>
