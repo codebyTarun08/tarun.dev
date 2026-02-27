@@ -1,17 +1,16 @@
-
 'use client';
 
 import * as React from 'react';
-import { db } from '@/lib/firebase';
+import { useFirestore } from '@/firebase';
 import { 
   collection, 
-  getDocs, 
   addDoc, 
   updateDoc, 
   deleteDoc, 
   doc, 
   query, 
-  orderBy 
+  orderBy,
+  getDocs
 } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,9 +40,11 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Plus, Edit2, Trash2, Loader2, GripVertical } from 'lucide-react';
+import { Plus, Edit2, Trash2, Loader2, GripVertical, Image as ImageIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 interface Skill {
   id: string;
@@ -55,16 +56,19 @@ interface Skill {
 }
 
 export function SkillsManager() {
+  const firestore = useFirestore();
   const [skills, setSkills] = React.useState<Skill[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [isSaving, setIsSaving] = React.useState(false);
   const [currentSkill, setCurrentSkill] = React.useState<Partial<Skill> | null>(null);
   const { toast } = useToast();
 
-  const fetchSkills = async () => {
+  const fetchSkills = React.useCallback(async () => {
+    if (!firestore) return;
     setLoading(true);
     try {
-      const q = query(collection(db, 'skills'), orderBy('order', 'asc'));
+      const q = query(collection(firestore, 'skills'), orderBy('order', 'asc'));
       const querySnapshot = await getDocs(q);
       const fetchedSkills = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Skill));
       setSkills(fetchedSkills);
@@ -73,47 +77,89 @@ export function SkillsManager() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [firestore]);
 
   React.useEffect(() => {
     fetchSkills();
-  }, []);
+  }, [fetchSkills]);
 
   const handleOpenDialog = (skill?: Skill) => {
-    setCurrentSkill(skill || { name: '', category: 'Frontend', icon: '', order: skills.length, visible: true });
+    setCurrentSkill(skill || { 
+      name: '', 
+      category: 'Frontend', 
+      icon: '', 
+      order: skills.length, 
+      visible: true 
+    });
     setIsDialogOpen(true);
   };
 
   const handleSaveSkill = async () => {
-    if (!currentSkill?.name || !currentSkill?.category) return;
+    if (!currentSkill?.name || !currentSkill?.category || !firestore) return;
 
+    setIsSaving(true);
     try {
       if (currentSkill.id) {
         const { id, ...data } = currentSkill;
-        await updateDoc(doc(db, 'skills', id), data);
+        const skillRef = doc(firestore, 'skills', id);
+        
+        updateDoc(skillRef, data)
+          .then(() => {
+            setIsDialogOpen(false);
+            fetchSkills();
+            toast({ title: 'Success', description: 'Skill updated successfully.' });
+          })
+          .catch((error) => {
+            const contextualError = new FirestorePermissionError({
+              path: skillRef.path,
+              operation: 'update',
+              requestResourceData: data,
+            });
+            errorEmitter.emit('permission-error', contextualError);
+          });
       } else {
-        await addDoc(collection(db, 'skills'), currentSkill);
+        const colRef = collection(firestore, 'skills');
+        addDoc(colRef, currentSkill as any)
+          .then(() => {
+            setIsDialogOpen(false);
+            fetchSkills();
+            toast({ title: 'Success', description: 'Skill added successfully.' });
+          })
+          .catch((error) => {
+            const contextualError = new FirestorePermissionError({
+              path: colRef.path,
+              operation: 'create',
+              requestResourceData: currentSkill,
+            });
+            errorEmitter.emit('permission-error', contextualError);
+          });
       }
-      setIsDialogOpen(false);
-      fetchSkills();
-      toast({ title: 'Success', description: 'Skill saved successfully.' });
     } catch (err) {
-      toast({ variant: 'destructive', title: 'Error', description: 'Failed to save skill.' });
+      console.error('Save operation error:', err);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const handleDeleteSkill = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this skill?')) return;
-    try {
-      await deleteDoc(doc(db, 'skills', id));
-      fetchSkills();
-      toast({ title: 'Success', description: 'Skill deleted.' });
-    } catch (err) {
-      toast({ variant: 'destructive', title: 'Error', description: 'Failed to delete skill.' });
-    }
+    if (!confirm('Are you sure you want to delete this skill?') || !firestore) return;
+    
+    const skillRef = doc(firestore, 'skills', id);
+    deleteDoc(skillRef)
+      .then(() => {
+        fetchSkills();
+        toast({ title: 'Success', description: 'Skill deleted.' });
+      })
+      .catch((error) => {
+        const contextualError = new FirestorePermissionError({
+          path: skillRef.path,
+          operation: 'delete',
+        });
+        errorEmitter.emit('permission-error', contextualError);
+      });
   };
 
-  if (loading) return <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
+  if (loading && skills.length === 0) return <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
 
   return (
     <Card className="shadow-lg">
@@ -122,7 +168,7 @@ export function SkillsManager() {
           <CardTitle>Skills Inventory</CardTitle>
           <CardDescription>Manage the technical expertise displayed in your marquee rows.</CardDescription>
         </div>
-        <Button onClick={() => handleOpenDialog()} className="rounded-full">
+        <Button onClick={() => handleOpenDialog()} className="rounded-full shadow-md">
           <Plus className="w-4 h-4 mr-2" />
           Add Skill
         </Button>
@@ -132,31 +178,42 @@ export function SkillsManager() {
           <TableHeader>
             <TableRow>
               <TableHead className="w-12"></TableHead>
-              <TableHead>Name</TableHead>
+              <TableHead>Skill</TableHead>
               <TableHead>Category</TableHead>
-              <TableHead>Visible</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {skills.map((skill) => (
-              <TableRow key={skill.id}>
+              <TableRow key={skill.id} className="group">
                 <TableCell><GripVertical className="w-4 h-4 text-muted-foreground/30" /></TableCell>
-                <TableCell className="font-medium">{skill.name}</TableCell>
                 <TableCell>
-                  <Badge variant="secondary">{skill.category}</Badge>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-secondary/50 p-1.5 overflow-hidden flex items-center justify-center">
+                      {skill.icon ? (
+                        <img src={skill.icon} alt={skill.name} className="w-full h-full object-contain" />
+                      ) : (
+                        <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                      )}
+                    </div>
+                    <span className="font-semibold">{skill.name}</span>
+                  </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={skill.visible ? "default" : "outline"}>
-                    {skill.visible ? 'Show' : 'Hide'}
+                  <Badge variant="secondary" className="shadow-sm">{skill.category}</Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge variant={skill.visible ? "default" : "outline"} className="shadow-sm">
+                    {skill.visible ? 'Visible' : 'Hidden'}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(skill)}>
+                    <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(skill)} className="rounded-full">
                       <Edit2 className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10" onClick={() => handleDeleteSkill(skill.id)}>
+                    <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 rounded-full" onClick={() => handleDeleteSkill(skill.id)}>
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
@@ -168,28 +225,50 @@ export function SkillsManager() {
       </CardContent>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[500px] rounded-2xl shadow-2xl">
           <DialogHeader>
-            <DialogTitle>{currentSkill?.id ? 'Edit Skill' : 'Add New Skill'}</DialogTitle>
-            <DialogDescription>Configure the skill name and appearance details.</DialogDescription>
+            <DialogTitle className="text-2xl font-bold">{currentSkill?.id ? 'Edit Skill' : 'Add New Skill'}</DialogTitle>
+            <DialogDescription>Configure the skill details and visual representation.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
+          <div className="space-y-6 py-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Skill Name</Label>
+              <Label htmlFor="name" className="text-sm font-bold">Skill Name</Label>
               <Input 
                 id="name" 
+                placeholder="e.g. React, Python, Figma"
                 value={currentSkill?.name || ''} 
                 onChange={(e) => setCurrentSkill({ ...currentSkill, name: e.target.value })} 
+                className="rounded-xl shadow-inner"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+
+            <div className="space-y-2">
+              <Label htmlFor="icon" className="text-sm font-bold">Icon URL</Label>
+              <div className="flex gap-2">
+                <Input 
+                  id="icon" 
+                  placeholder="https://cdn.jsdelivr.net/...svg"
+                  value={currentSkill?.icon || ''} 
+                  onChange={(e) => setCurrentSkill({ ...currentSkill, icon: e.target.value })} 
+                  className="rounded-xl shadow-inner"
+                />
+                {currentSkill?.icon && (
+                  <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center p-2 border shadow-sm">
+                    <img src={currentSkill.icon} alt="Preview" className="w-full h-full object-contain" />
+                  </div>
+                )}
+              </div>
+              <p className="text-[10px] text-muted-foreground">Use a direct image URL or a DevIcon SVG link.</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
+                <Label htmlFor="category" className="text-sm font-bold">Category</Label>
                 <Select 
                   value={currentSkill?.category} 
                   onValueChange={(val) => setCurrentSkill({ ...currentSkill, category: val })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="rounded-xl shadow-sm">
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -197,21 +276,27 @@ export function SkillsManager() {
                     <SelectItem value="Backend">Backend</SelectItem>
                     <SelectItem value="AI">AI</SelectItem>
                     <SelectItem value="Tools">Tools</SelectItem>
+                    <SelectItem value="Design">Design</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="order">Display Order</Label>
+                <Label htmlFor="order" className="text-sm font-bold">Display Order</Label>
                 <Input 
                   id="order" 
                   type="number" 
                   value={currentSkill?.order || 0} 
-                  onChange={(e) => setCurrentSkill({ ...currentSkill, order: parseInt(e.target.value) })} 
+                  onChange={(e) => setCurrentSkill({ ...currentSkill, order: parseInt(e.target.value) || 0 })} 
+                  className="rounded-xl shadow-inner"
                 />
               </div>
             </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="visible">Show on Portfolio</Label>
+
+            <div className="flex items-center justify-between p-4 bg-secondary/30 rounded-2xl border border-border/50">
+              <div className="space-y-0.5">
+                <Label htmlFor="visible" className="text-sm font-bold">Show on Portfolio</Label>
+                <p className="text-xs text-muted-foreground">Toggle visibility on the homepage marquee.</p>
+              </div>
               <Switch 
                 id="visible" 
                 checked={currentSkill?.visible} 
@@ -219,9 +304,12 @@ export function SkillsManager() {
               />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleSaveSkill}>Save Skill</Button>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="rounded-full">Cancel</Button>
+            <Button onClick={handleSaveSkill} disabled={isSaving} className="rounded-full shadow-lg shadow-primary/20">
+              {isSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
+              {currentSkill?.id ? 'Save Changes' : 'Add Skill'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
