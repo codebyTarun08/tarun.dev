@@ -85,7 +85,7 @@ export function Projects() {
             <h2 className="text-sm font-bold text-primary uppercase tracking-[0.3em] mb-4">Portfolio</h2>
             <h3 className="text-4xl font-bold">Featured Projects</h3>
           </div>
-          <p className="max-w-md text-muted-foreground text-right hidden md:block">
+          <p className=" text-lg max-w-md text-muted-foreground text-right hidden md:block">
             A selection of my recent works fetched directly from GitHub, showcasing real-world applications with live demos.
           </p>
         </div>
