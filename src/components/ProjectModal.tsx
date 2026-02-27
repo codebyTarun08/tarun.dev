@@ -43,17 +43,28 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
           }
         });
         
-        if (!response.ok) throw new Error("README not found");
-        
-        const content = await response.text();
-        setReadme(content);
-        setLoading(false);
+        if (response.ok) {
+          const content = await response.text();
+          setReadme(content);
+          setLoading(false);
 
-        setAiLoading(true);
-        const summaryResult = await summarizeProjectReadme({ readmeContent: content });
-        setAiSummary(summaryResult.summary);
+          setAiLoading(true);
+          try {
+            const summaryResult = await summarizeProjectReadme({ readmeContent: content });
+            setAiSummary(summaryResult.summary);
+          } catch (aiErr) {
+            console.warn("AI Summary synthesis skipped or failed", aiErr);
+            setAiSummary(null);
+          } finally {
+            setAiLoading(false);
+          }
+        } else {
+          // README not found - this is a valid state for some repos
+          setReadme(null);
+          setAiSummary(null);
+        }
       } catch (err) {
-        console.error("Failed to fetch README or summary", err);
+        console.warn("Failed to synchronize with GitHub root manifest", err);
         setReadme(null);
       } finally {
         setLoading(false);
@@ -88,7 +99,7 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                       key={`${name}-${idx}`} 
                       variant="outline" 
                       className={cn(
-                        "uppercase text-[10px] font-bold px-3 py-1.5 flex items-center gap-2",
+                        "uppercase text-[10px] font-bold px-3 py-1.5 flex items-center gap-2 transition-all hover:scale-105",
                         !isObject && "bg-primary/5 border-primary/20 text-primary"
                       )}
                       style={isObject ? {
@@ -111,7 +122,7 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                     typeof existing === 'string' ? existing === t : existing.name === t
                   )
                 ).map(topic => (
-                  <Badge key={topic} variant="secondary" className="bg-secondary/50 text-secondary-foreground uppercase text-[10px] font-bold px-3 py-1.5">
+                  <Badge key={topic} variant="secondary" className="bg-secondary/50 text-secondary-foreground uppercase text-[10px] font-bold px-3 py-1.5 transition-all hover:scale-105">
                     {topic}
                   </Badge>
                 ))}
@@ -191,9 +202,10 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                     </ReactMarkdown>
                   </div>
                 ) : (
-                  <div className="py-20 text-center bg-secondary/20 rounded-3xl border-2 border-dashed border-border">
-                    <BookOpen className="w-16 h-16 text-muted-foreground/20 mx-auto mb-6" />
+                  <div className="py-20 text-center bg-secondary/20 rounded-3xl border-2 border-dashed border-border group hover:border-primary/50 transition-colors">
+                    <BookOpen className="w-16 h-16 text-muted-foreground/20 mx-auto mb-6 group-hover:scale-110 transition-transform" />
                     <p className="text-muted-foreground text-lg font-medium">Repository root manifest not found.</p>
+                    <p className="text-xs text-muted-foreground/60 mt-2">The README.md file could not be synchronized from the GitHub repository.</p>
                   </div>
                 )}
               </section>

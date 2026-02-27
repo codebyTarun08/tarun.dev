@@ -65,7 +65,7 @@ service cloud.firestore {
       allow write: if isPortfolioOwner();
     }
 
-    // Allow portfolio config reading (like resume URL)
+    // Allow portfolio config reading and writing (like resume URL)
     match /portfolioConfig/{configId} {
       allow get: if true;
       allow write: if isPortfolioOwner();
