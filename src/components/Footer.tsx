@@ -17,7 +17,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex flex-col items-center md:items-start">
             <Link href="/" className="text-xl font-bold tracking-tighter text-primary mb-2">
-              DevSphere<span className="text-accent">.</span>
+              Tarun<span className="text-accent">.</span>
             </Link>
             <p className="text-sm text-muted-foreground">© {year || "..."} Tarun. All rights reserved.</p>
           </div>
