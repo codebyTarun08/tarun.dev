@@ -21,6 +21,9 @@ interface ProjectModalProps {
   onClose: () => void;
 }
 
+// Session-level cache for AI summaries to save credits and improve speed
+const aiSummaryCache = new Map<number, string>();
+
 export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
   const [readme, setReadme] = React.useState<string | null>(null);
   const [aiSummary, setAiSummary] = React.useState<string | null>(null);
@@ -48,10 +51,20 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
           setReadme(content);
           setLoading(false);
 
+          // Check cache first before calling AI
+          const cachedSummary = aiSummaryCache.get(project.id);
+          if (cachedSummary) {
+            setAiSummary(cachedSummary);
+            return;
+          }
+
           setAiLoading(true);
           try {
             const summaryResult = await summarizeProjectReadme({ readmeContent: content });
-            setAiSummary(summaryResult.summary);
+            const summary = summaryResult.summary;
+            setAiSummary(summary);
+            // Store in cache
+            aiSummaryCache.set(project.id, summary);
           } catch (aiErr) {
             console.warn("AI Summary synthesis skipped or failed", aiErr);
             setAiSummary(null);
@@ -104,7 +117,7 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
                       )}
                       style={isObject ? {
                         backgroundColor: `${tech.bgColor}1A`, // 10% opacity
-                        color: tech.bgColor,
+                        color: tech.borderColor,
                         borderColor: tech.borderColor
                       } : {}}
                     >

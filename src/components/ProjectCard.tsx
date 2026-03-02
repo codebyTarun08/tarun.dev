@@ -107,11 +107,11 @@ export function ProjectCard({ project, onOpenDetails }: ProjectCardProps) {
                     variant="default" 
                     className={cn(
                       "text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 shadow-sm transition-all hover:bg-opacity-80 flex items-center gap-1.5",
-                      !isObject && "bg-primary/30 text-primary border-primary/40 hover:bg-primary/10 hover:text-primary"
+                      !isObject && "bg-primary/20 text-primary border-primary/40 hover:bg-primary/10 hover:text-primary"
                     )}
                     style={isObject ? {
                       backgroundColor: `${tech.bgColor}33`, // 20% opacity
-                      color: tech.bgColor,
+                      color: tech.borderColor,
                       borderColor: tech.borderColor
                     } : {}}
                   >
