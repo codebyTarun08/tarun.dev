@@ -54,7 +54,7 @@ export function About() {
     <section id="about" className="py-24 bg-secondary/30">
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-          <div className="relative reveal sticky top-24">
+          <div className="relative reveal lg:sticky lg:top-24 mb-12 lg:mb-0">
             <div className="aspect-square rounded-2xl overflow-hidden relative group border-4 border-white dark:border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
               <Image 
                 src={imgSrc} 
